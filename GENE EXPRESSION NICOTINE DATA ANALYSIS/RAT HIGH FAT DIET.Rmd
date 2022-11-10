@@ -1,0 +1,644 @@
+---
+title: "HIGH FAT ANALYSIS"
+output: html_notebook
+---
+
+```{r}
+############################
+##FOR MAC
+############################
+#hf_2PCR <-read.csv("/Volumes/F4L SWBB//R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - HIG FAT.csv")
+#library(dplyr)
+```
+
+
+```{r}
+############################
+##FOR PC
+############################
+hf_2PCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - HIG FAT.csv")
+library(dplyr)
+#hf_2PCR
+```
+
+```{r}
+#mpcr_nor # LOG 10 TRANSFORMED
+library(dplyr)
+hf_2PCR_dat <- fx(hf_2PCR[,6:9])
+hf_2PCR_lab <- hf_2PCR[,1:4]
+hf_2PCR_non <- select(hf_2PCR, -X.)
+############################
+hf_nor_2PCR <- data.frame(hf_2PCR_lab,hf_2PCR_dat)
+############################
+CERKL_hf2pcr <- fx(hf_2PCR$CERKL) #NON NORM
+CERKL_hf2pcrx <- fx_z2(CERKL_hf2pcr, 0.7419641, 0.4426305) #NON NORM
+
+#sd(hf_2PCR$CERKL)
+############################
+############################
+############################
+library(dplyr)
+############################
+############################
+
+############################
+normal_diet <- hf_nor_2PCR[1:24, 2:8]
+normal_diet_non <- hf_2PCR_non[1:24, 2:8]
+high_fat <- hf_nor_2PCR[25:47, 2:8] #
+high_fat_non <- hf_2PCR_non[25:47, 2:8]
+############################
+############################
+############################
+```
+
+
+```{r}
+hf_2PCR
+hf_nor_2PCR ##LOG10
+high_fat_non
+high_fat
+hf_2PCR
+shapiro.test(CERKL_hf2pcr)
+
+```
+
+
+```{r}
+normal_diet_non
+normal_diet
+Rpcr_A
+
+```
+
+
+
+```{r}
+shapiro.test	(	high_fat$CERKL	)
+shapiro.test	(	high_fat$FA2H	)
+shapiro.test	(	high_fat$CHRNA10	)
+shapiro.test	(	high_fat_non$SMYD1	)
+
+
+anova(lm(high_fat$CERKL~high_fat$DX*high_fat$SEX))
+anova(lm(high_fat$FA2H~high_fat$DX*high_fat$SEX))
+anova(lm(high_fat$CHRNA10~high_fat$DX*high_fat$SEX))
+anova(lm(high_fat_non$SMYD1~high_fat$DX*high_fat$SEX))
+
+
+```
+
+
+```{r}
+shapiro.test	(	normal_diet$CERKL	)
+shapiro.test	(	normal_diet$FA2H	)
+shapiro.test	(	normal_diet_non$CHRNA10	)
+shapiro.test	(	normal_diet_non$SMYD1	)
+
+anova(lm(normal_diet_non$CERKL~normal_diet_non$DX*normal_diet_non$SEX))
+anova(lm(normal_diet$FA2H~normal_diet_non$DX*normal_diet_non$SEX))
+anova(lm(normal_diet_non$CHRNA10~normal_diet_non$DX*normal_diet_non$SEX))
+anova(lm(normal_diet_non$SMYD1~normal_diet_non$DX*normal_diet_non$SEX))
+```
+
+
+```{r}
+multiwaydata <- hf_2PCR_non[,2:7]
+mwanov <- select(multiwaydata, -CHRNA10)
+mwanovlab <- mwanov[,1:3]
+
+mwanovdat <- mwanov[,4:5]
+
+CERKL_z <- fx_z(mwanovdat$CERKL)
+FA2H_z <- fx_z(mwanovdat$FA2H)
+genes <- cbind(CERKL_z,FA2H_z)
+mwan <- data.frame(mwanovlab,genes)
+#hf_2PCR_non
+#mwan
+
+mwanovdat
+
+#cerkl_m20  <-1/(mwanovdat$CERKL)
+logcerkl <- log10(hf_2PCR_non$CERKL)
+qqnorm(logcerkl)
+#+line(-0.8~2.5)
+hist(logcerkl)
+shapiro.test(logcerkl)
+
+shapiro.test(logcerkl)
+#hist(logcerkl)
+cerklman <- lm(logcerkl~hf_2PCR_non$DX*hf_2PCR_non$DIET*hf_2PCR_non$SEX)
+anova(cerklman)
+shapiro.test(FA2H_z)
+fa2hlm <- lm(mwan$FA2H_z~mwan$DX*mwan$DIET*mwan$SEX)
+anova(fa2hlm)
+```
+
+
+```{r}
+ #    mwanDX_1 <-factor( mwan$DX)
+  #  mwanDIET_1<-factor(mwan$DIET)
+    str(mwan)
+#friedman.test(mwan$CERKL_z, groups =  mwanDX_1, blocks= mwanDIET_1, data= mwan)
+ pairwise.wilcox.test(mwan$CERKL_z, g =  mwan$DX)
+pairwise.wilcox.test(mwan$CERKL_z, g =  mwan$SEX)
+pairwise.wilcox.test(mwan$CERKL_z, g =  mwan$DIET)
+```
+
+
+```{r}
+shapiro.test(hf_2PCR_non$CERKL)# NONPARA
+shapiro.test(hf_2PCR_non$CHRNA10)
+shapiro.test(hf_2PCR_non$FA2H)
+shapiro.test(hf_2PCR_non$SMYD1)
+hf_2PCR_non
+```
+
+
+```{r}
+#x11_1 <- lm(hf_2PCR_non$CERKL~hf_2PCR_non$DX*hf_2PCR_non$SEX*hf_2PCR_non$DIET)
+x11_2 <- lm(hf_2PCR_non$FA2H~hf_2PCR_non$DX*hf_2PCR_non$SEX*hf_2PCR_non$DIET)
+x11_2 <- lm(hf_2PCR_non$FA2H~hf_2PCR_non$DX*hf_2PCR_non$SEX*hf_2PCR_non$DIET)
+x11_3 <- lm(hf_2PCR_non$CHRNA10~hf_2PCR_non$DX*hf_2PCR_non$SEX*hf_2PCR_non$DIET)
+x11_4 <- lm(hf_2PCR_non$SMYD1~hf_2PCR_non$DX*hf_2PCR_non$SEX*hf_2PCR_non$DIET)
+
+wilcox.test(normal_diet_non$CERKL, high_fat_non$CERKL)
+anova(x11_2)
+anova(x11_3)
+anova(x11_4)
+```
+
+
+```{r}
+anova(lm(normal_diet_non$CERKL~normal_diet_non$DX*normal_diet_non, normal_diet_non$SEX))
+anova(lm(normal_diet$FA2H~normal_diet$DX*normal_diet$SEX))
+anova(lm(normal_diet_non$CHRNA10~normal_diet_non$DX*normal_diet_non$SEX))
+anova(lm(normal_diet_non$SMYD1~normal_diet_non$DX*normal_diet_non$SEX))
+```
+
+
+
+
+```{r}
+shapiro.test(normal_diet$FA2H)
+#normal_diet
+x_c <- anova(lm(normal_diet$FA2H~normal_diet$DX*normal_diet$SEX))
+x_d <- anova(lm(normal_diet$FA2H~normal_diet$DX+normal_diet$SEX))
+x_c
+x_d
+
+#anova(x_c,x_d)
+```
+
+
+```{r}
+
+#normal_diet
+interaction.plot(normal_diet$DX, normal_diet$SEX, normal_diet$CERKL, xlab="DX", ylab="CERKL", main="Rat - Normal Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = 
+         c("pink", "blue"))
+
+
+```
+
+
+```{r}
+interaction.plot(normal_diet$DX, normal_diet$SEX, normal_diet$FA2H, xlab="DX", ylab="FA2H",  main="Rat - Normal Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = 
+         c("pink", "blue"))
+```
+
+
+
+```{r}
+#hf_nor_2PCR
+shapiro.test(CERKL_hf2pcr) # NON PARAMETRIC
+shapiro.test(hf_nor_2PCR$CHRNA10) # PARAMETRIC
+shapiro.test(hf_nor_2PCR$FA2H) # PARAMETRIC
+shapiro.test(hf_nor_2PCR$SMYD1) # PARAMETRIC
+
+```
+
+
+```{r}
+#hf_2PCR$CERKL
+treatment1 <- hf_2PCR[order(hf_2PCR$DX),]
+treatment_C <- select(treatment1, -SPECIES, -X.)[1:24,]
+treatment_C
+treatment_N <- select(treatment1, -SPECIES, -X.)[25:47,]
+treatment_N
+sex_F <- hf_2PCR[order(hf_2PCR$SEX),][1:24,]
+sex_F
+sex_M <- hf_2PCR[order(hf_2PCR$SEX),][25:47,]
+sex_M
+
+#sex_1 <- select(treatment, -SPECIES, -X.)[1:24,]
+#sex_1
+```
+
+
+```{r}
+#sex <- hf_2PCR[order(t2PCR$SEX),]
+#hf_2PCR$DX
+#hf_2PCR$DIET
+#hf_2PCR$SEX
+
+############################
+#CERKL p < 0.01
+############################
+wilcox.test(normal_diet$CERKL,high_fat$CERKL, exact = FALSE) # CERKL IS DIFFERENT WITH DIFFERENT DIETS
+wilcox.test(treatment_C$CERKL,treatment_N$CERKL, exact = FALSE) # CERKL IS DIFFERENT WITH DIFFERENT DIETS
+wilcox.test(sex_F$CERKL,sex_M$CERKL, exact = FALSE) # CERKL IS DIFFERENT WITH DIFFERENT DIETS
+
+
+
+```
+
+
+```{r}
+############################
+#CHRNA10
+############################
+x_0<- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$SEX)
+y_0<- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX)
+Z_0<- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DIET)
+y1 <- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX*hf_nor_2PCR$DIET)
+x1 <- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX+hf_nor_2PCR$DIET)
+y1_S <- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX)
+x1_S <- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX*hf_nor_2PCR$DIET+hf_nor_2PCR$SEX)
+y1_lm <- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX)
+x1_lm <- lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX+hf_nor_2PCR$DIET+hf_nor_2PCR$SEX)
+############################
+```
+
+
+```{r}
+#CHRNA10
+anova(x_0) #NO DIF W/ TREATMENT
+anova(y_0)#NO DIF BTWEEN GENDERS
+anova(Z_0)
+#anova(x_0,y_0)
+```
+
+
+```{r}
+#CHRNA10
+anova(y1) #NO SIGNIFICANT EFFECT AS INTERDEPENDENT VARIABLES
+anova(x1) # NO SIGNIFICANT EFFECT AS INDEPENDENT VARIABLES
+anova(y1,x1) # NO DIFFERENCE WHEN DIET IS REMOVED
+```
+
+
+```{r}
+
+#anova(lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX))
+#anova(lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX))
+
+anova(y1_S) # TREATMENT, SEX OR DIET DID NOT INFLUENCE CHRNA10 EXPRESSION IN AN INTERDEPENDENT REGRESSION MODEL
+anova(x1_S) # TREATMENT, SEX OR DIET DID NOT INFLUENCE CHRNA10 EXPRESSION IN A INDEPENDENT REGRESSION MODEL
+anova(y1_S,x1_S) # TREATING SEX AND DIET AS INTERDEPENDENT AND REMOVING SEX DID NOT SIGNIFICANTLY AFFECT THE LINEAR MODEL
+```
+
+
+```{r}
+anova(y1_lm)
+anova(x1_lm)
+anova(y1_lm,x1_lm)
+```
+
+
+```{r}
+anova(y1,y1_lm) #removing sex didnt affect
+anova(x1,x1_lm) #removing sex didnt affect
+```
+
+
+```{r}
+############################
+#y1_lm
+step(x1_lm, direction="backward")
+```
+
+
+```{r}
+#CHRNA10 FOLD CHANGE VS (TREATMENT * DIET * SEX MODEL) = THIS IS A BETTER FIT - INTERACTION
+
+summary(y1_lm)
+
+#CHRNA10 FOLD CHANGE VS (TREATMENT + DIET +  SEX MODEL) = THIS IS NOT A GOOD FIT
+
+summary(x1_lm)
+
+```
+
+
+
+```{r}
+############################
+#FA2H
+############################
+#SEX // TREATMENT
+#shapiro.test(hf_nor_2PCR$FA2H)
+x_1<- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$SEX)
+y_1<- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX)
+Z_1<- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DIET)
+anova(x_1)
+anova(y_1)
+anova(Z_1)
+
+
+
+```
+
+
+```{r}
+############################
+#FA2H
+############################
+#TREATMENT & DIET
+
+y2 <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$DIET)
+x2 <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX+hf_nor_2PCR$DIET)
+anova(y2)
+anova(x2)
+anova(y2,x2)
+
+
+```
+
+
+```{r}
+############################
+#FA2H
+############################
+#TREATMENT & SEX
+
+y_2_ts <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$SEX)
+x_2_ts <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX+hf_nor_2PCR$SEX)
+anova(y_2_ts)
+anova(x_2_ts)
+anova(y_2_ts,x_2_ts)
+# two way anova (treatment & sex)
+```
+
+
+```{r}
+y2_S <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX)
+x2_S <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX+hf_nor_2PCR$DIET+hf_nor_2PCR$SEX)
+Z2_S <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$DIET+hf_nor_2PCR$SEX)
+
+anova(y2_S)
+anova(x2_S)
+anova(Z2_S)
+
+summary(Z2_S)
+```
+
+
+```{r}
+summary(y2_S)
+summary(x2_S)
+```
+
+
+```{r}
+anova(y2_S,x2_S)
+```
+
+
+```{r}
+############################ removing sex does not significantly affect the regression model 
+
+y2_lm <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX)
+x2_lm <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$DIET+hf_nor_2PCR$SEX)
+y_2_lm <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$SEX*hf_nor_2PCR$DIET)
+x_2_lm <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$SEX+hf_nor_2PCR$DIET)
+
+anova(y2_lm)
+anova(x2_lm)
+anova(y2_lm,x2_lm)
+```
+
+
+```{r}
+
+#TREATMENT ALONE DID NOT HAVE AN EFFECT IN FA2H EXPRESSION IN RATS. SIMILARLY, SEX AND DIET INTERACTON IS NOT SIG/ TREATMENT AND DIET INTERACTION IS (0.0232036 *  ), WITH THE HIGHER CONTRIBUTION COMING DIRECTLY FROM DIET (0.0001287 ***). DIET AND TREATMENT ARE BETTER PREDICTORS THAN (1) INTERDEPENDENT SEX AND DIET OR (2) INTERDEPENDENT TREATMENT, SEX AND DIET. 
+
+anova(y_2_lm) 
+anova(x_2_lm) 
+anova(y_2_lm, x_2_lm) 
+```
+
+
+```{r}
+############################
+#y2_1_lm <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX)
+#x2_1_lm <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$SEX+hf_nor_2PCR$DIET)
+############################
+```
+
+
+
+
+```{r}
+anova(y2_S)
+anova(x2_S)
+anova(y2_S,x2_S)
+```
+
+
+```{r}
+anova(y2_lm,x2_lm)
+
+#anova(y2_1_lm,x2_1_lm)
+
+#anova(x2_S, x2) #removing sex did not significantly affect the model. 
+
+```
+
+
+```{r}
+############################
+step(x2_S, direction="backward")
+summary(x2_S)
+
+```
+
+
+```{r}
+step(x2_lm,direction="backward" )
+summary(x2_lm)
+```
+
+
+```{r}
+summary(x2_S)
+```
+
+
+```{r}
+summary(lm(hf_nor_2PCR$FA2H ~ hf_nor_2PCR$DX + hf_nor_2PCR$SEX))
+summary(lm(hf_nor_2PCR$FA2H ~ hf_nor_2PCR$DX + hf_nor_2PCR$DIET))
+```
+
+
+```{r}
+
+ol <- lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DIET)
+summary(ol)
+anova(ol)
+
+```
+
+
+```{r}
+#hf_nor_2PCR
+
+#x2_S
+y2_lm
+
+summary(y2_lm) # In terms of interactions, when analyzing a linear model taking into consideration categorical variables such as sex, treatment and diet,the only statistically significant influence to the model was seen with the interaction between treatment and diet (P - 0.0155 *), with diet alone being the biggest overall determinant of FA2H expression. Similarly,  in the normal diet group, the highest statistically significant variable to influence gene expression was treatment alone (P - 0.01239). This points towards a significant relationship between diet and treatment. 
+
+# diet (P- 0.0440 *)//hf_nor_2PCR$DXNICOTINE:hf_nor_2PCR$DIETNORMAL (P - 0.0155 *) 
+#summary(x2_S) # Diet had the biggest influences in gene expression ( P - 0.000215 ) when compared to tt
+### in rats, diet was the biggest factor behind th4e interaction models. The relationship of 
+```
+
+```{r}
+
+
+####### OPEN FILE ("/Volumes/F4L SWBB/R STUDIO/NICOTINE PAPER/qPCR H vs M.Rmd") TO LOAD VARIABLES
+
+vars<- lm(m_nor_FA2H~mcor_dx*mcor_sex)
+anova(vars)
+```
+
+
+```{r}
+### fhCERKL < -  CONTROL =  0.1760688 ,   NICOTINE = -0.1592801
+### mhCERKL < -  CONTROL =  0.1024853 ,   NICOTINE =  -0.1003921 
+### fhFA2H < - CONTROL =  -0.4844082 ,   NICOTINE = -0.4617534 
+### mhFA2H < - CONTROL =  -1.0720316  ,   NICOTINE = -0.4392237 
+
+par(mfrow=c(1,2))
+################################################################################################################################################################################################
+################################################################################################################################################################################################
+interaction.plot(mcor_dx,mcor_sex,m_nor_CERKL, xlab="DX",  ylab="CERKL", main="Rat", ylim = c(-1.5,1.5),cex.axis = 0.8, legend=0 ,  col = c("pink", "blue"), lwd=2.0, pch=c(1,1) ,xpd = F, trace.label = "SEX")
+################################
+legend("topright", lwd=2.0,  legend = c("F","M"), lty=c(2,1), col = c("pink", "blue"))
+################################
+#points(1,0.1760688)#control- F
+#points(1,0.1024853)#control- M
+################################
+#points(2,-0.1592801)#N- F
+#points(2,-0.1003921 )#N- M
+################################################################################################################################################################################################
+################################################################################################################################################################################################
+interaction.plot(mcor_dx,mcor_sex,m_nor_FA2H, xlab="DX", ylab="FA2H", main="Rat", ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX")
+################################
+legend("topright", lwd=2.0, legend = c("F","M"), lty=c(2,1), col = c("pink", "blue"))
+################################
+#points(1,-0.4844082)#control- F
+#points(1,-1.0720316)#control- M
+################################
+#points(2, -0.4617534 )#N- F
+#points(2,-0.4392237)#N- M
+################################
+```
+
+
+```{r}
+############################
+#SMYD1
+############################
+x_3<- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX)
+y_3<- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$SEX)
+z_3<- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DIET)
+anova(x_3)
+anova(y_3)
+anova(z_3)
+```
+
+
+```{r}
+y3 <- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX*hf_nor_2PCR$DIET)
+x3 <- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX+hf_nor_2PCR$DIET)
+anova(y3)
+anova(x3)
+anova(y3,x3)
+```
+
+
+```{r}
+
+y3_S <- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX)
+x3_S <- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX+hf_nor_2PCR$DIET+hf_nor_2PCR$SEX)
+anova(y3_S)
+anova(y3_S)
+anova(y3_S,x3_S)
+```
+
+
+```{r}
+############################
+
+y3_lm <- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX*hf_nor_2PCR$DIET*hf_nor_2PCR$SEX)
+x3_lm <- lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX+hf_nor_2PCR$DIET+hf_nor_2PCR$SEX)
+anova(y3_lm)
+anova(x3_lm)
+anova(y3_lm, x3_lm)
+```
+
+
+```{r}
+############################
+anova(y3,x3) # REMOVING DIET MADE NO FX IN SMYD1 EXPRESSION
+#anova(y3_S,x3_S) & anova(y3_lm,x3_lm) are the same
+anova(y3_S,x3_S) # REMOVING DIET MADE NO FX IN SMYD1 EXPRESSION
+summary(y3_S)
+```
+
+
+```{r}
+high_fat
+ts_m <- lm(high_fat$FA2H~high_fat$DX)
+s_m <- lm(high_fat$FA2H~high_fat$SEX)
+anova(ts_m)
+anova(s_m)
+```
+
+```{r}
+############################
+step(x3_lm, direction="backward")
+```
+
+
+```{r}
+summary(x3_lm)
+```
+
+```{r}
+anova(lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX*hf_nor_2PCR$DIET))
+anova(lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX+hf_nor_2PCR$DIET))
+```
+
+
+```{r}
+anova(lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX*hf_nor_2PCR$SEX))
+anova(lm(hf_nor_2PCR$SMYD1~hf_nor_2PCR$DX+hf_nor_2PCR$SEX))
+```
+
+```{r}
+anova(lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX*hf_nor_2PCR$DIET))
+anova(lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX+hf_nor_2PCR$DIET))
+```
+
+
+```{r}
+anova(lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX*hf_nor_2PCR$SEX))
+anova(lm(hf_nor_2PCR$CHRNA10~hf_nor_2PCR$DX+hf_nor_2PCR$SEX))
+```
+
+```{r}
+anova(lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX*hf_nor_2PCR$DIET))
+anova(lm(hf_nor_2PCR$FA2H~hf_nor_2PCR$DX+hf_nor_2PCR$DIET))
+```

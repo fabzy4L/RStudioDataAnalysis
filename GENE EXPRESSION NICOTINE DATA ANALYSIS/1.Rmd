@@ -1,0 +1,76 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+qPCR
+t2PCR
+mPCR
+```
+
+
+```{r}
+h_nor_COL4A1
+h_cor
+```
+
+
+```{r}
+ht2pcr
+
+```
+
+
+```{r}
+tnpcr <- qPCR[1:48,4:13]
+markpcr <- qPCR[1:48,1:3]
+
+```
+
+
+```{r}
+n1_pcr <- fx3(tnpcr)
+new_norm <- data.frame(markpcr,n1_pcr)
+new_norm
+```
+
+
+```{r}
+#new_norm
+norm_CERKL	<-	new_norm$CERKL
+norm_CHRNA10	<-	new_norm$CHRNA10
+norm_FA2H	<-	new_norm$FA2H
+norm_SMYD1	<-	new_norm$SMYD1
+norm_CLIC4	<-	new_norm$CLIC4
+norm_COL4A1	<-	new_norm$COL4A1
+norm_FAM189A1	<-	new_norm$FAM189A1
+norm_PTGDR	<-	new_norm$PTGDR
+norm_SDCCAG8	<-	new_norm$SDCCAG8
+norm_TF	<-	new_norm$TF
+```
+
+
+```{r}
+shapiro.test	(	norm_CERKL	)
+shapiro.test	(	norm_CHRNA10	)
+shapiro.test	(	norm_FA2H	)
+shapiro.test	(	norm_SMYD1	)
+shapiro.test	(	norm_CLIC4	)
+shapiro.test	(	norm_COL4A1	)
+shapiro.test	(	norm_FAM189A1	)
+shapiro.test	(	norm_PTGDR	)
+shapiro.test	(	norm_SDCCAG8	)
+shapiro.test	(	norm_TF	)
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

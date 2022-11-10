@@ -1,0 +1,96 @@
+---
+title: "CORRELATIONAL DATA"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+#If not already installed
+#install.packages("gplots")
+#install.packages("devtools")
+
+#Load necessary packages
+library("gplots")
+library("devtools")
+
+#Load latest version of heatmap.3 function
+source_url("https://raw.githubusercontent.com/obigriffith/biostar-tutorials/master/Heatmaps/heatmap.3.R")
+
+#Set a working directory for output files
+setwd("/Users/ogriffit/git/biostar-tutorials/Heatmaps")
+
+#Create a fake dataset for demonstration purposes
+prob_matrix=replicate(100, rnorm(20))
+drug_names=paste("drug",letters[1:20],sep="_")
+patient_ids=paste("patient",c(1:100),sep="_")
+rownames(prob_matrix)=drug_names
+colnames(prob_matrix)=patient_ids
+
+#Create fake color side bars
+drugclass_colors=sample(c("darkorchid","darkred"), length(drug_names), replace = TRUE, prob = NULL)
+drugcategory_colors=sample(c("green","darkgreen"), length(drug_names), replace = TRUE, prob = NULL)
+subtype_colors=sample(c("red","blue","cyan","pink","yellow","green"), length(patient_ids), replace = TRUE, prob = NULL)
+Mcolors=sample(c("black","white","grey"), length(patient_ids), replace = TRUE, prob = NULL)
+Ncolors=sample(c("black","white","grey"), length(patient_ids), replace = TRUE, prob = NULL)
+Tcolors=sample(c("black","white","grey"), length(patient_ids), replace = TRUE, prob = NULL)
+HER2colors=sample(c("black","white","grey"), length(patient_ids), replace = TRUE, prob = NULL)
+PRcolors=sample(c("black","white","grey"), length(patient_ids), replace = TRUE, prob = NULL)
+ERcolors=sample(c("black","white","grey"), length(patient_ids), replace = TRUE, prob = NULL)
+rlab=t(cbind(drugclass_colors,drugcategory_colors))
+clab=cbind(subtype_colors,Mcolors,Ncolors,Tcolors,HER2colors,PRcolors,ERcolors)
+rownames(rlab)=c("Class","Category")
+colnames(clab)=c("Subtype","M","N","T","HER2","PR","ER")
+
+#Define custom dist and hclust functions for use with heatmaps
+mydist=function(c) {dist(c,method="euclidian")}
+myclust=function(c) {hclust(c,method="average")}
+
+#Create heatmap using custom heatmap.3 source code loaded above
+pdf(file="heatmap3_example.pdf")
+main_title="Drug Response Predictions"
+par(cex.main=1)
+heatmap.3(prob_matrix, hclustfun=myclust, distfun=mydist, na.rm = TRUE, scale="none", dendrogram="both", margins=c(6,12),
+Rowv=TRUE, Colv=TRUE, ColSideColors=clab, RowSideColors=rlab, symbreaks=FALSE, key=TRUE, symkey=FALSE,
+density.info="none", trace="none", main=main_title, labCol=FALSE, labRow=drug_names, cexRow=1, col=rev(heat.colors(75)),
+ColSideColorsSize=7, RowSideColorsSize=2, KeyValueName="Prob. Response")
+legend("topright",legend=c("Basal","LumA","LumB","Her2","Claudin","Normal","","Positive","Negative","NA","","Targeted","Chemo","","Approved","Experimental"),
+fill=c("red","blue","cyan","pink","yellow","green","white","black","white","grey","white","darkorchid","darkred","white","green","darkgreen"), border=FALSE, bty="n", y.intersp = 0.7, cex=0.7)
+dev.off()
+
+#Example to show that it now also works with just a single column or single row
+mat <- matrix(1:100, byrow=T, nrow=10)
+column_annotation <- sample(c("red", "blue", "green"), 10, replace=T)
+column_annotation <- as.matrix(column_annotation)
+colnames(column_annotation) <- c("Variable X")
+
+row_annotation <- sample(c("red", "blue", "green"), 10, replace=T)
+row_annotation <- as.matrix(t(row_annotation))
+rownames(row_annotation) <- c("Variable Y")
+
+heatmap.3(mat, RowSideColors=row_annotation, ColSideColors=column_annotation)
+```
+
+
+```{r}
+#ggheatmap
+install.packages.2 <- function (pkg) if (!require(pkg)) install.packages(pkg);
+install.packages.2('remotes')
+
+remotes::install_github("ropensci/plotly") 
+remotes::install_github('talgalili/heatmaply')
+```
+
+
+```{r}
+ggheatmap(mtcars,   row_side_colors = mtcars[, c("cyl", "vs"), drop=FALSE],     ## colors are just gplots::bluered(5)    row_side_palette = c("0" = "#0000FF", "1" = "#8080FF",  "4" = "#FFFFFF", "6" = "#FF8080", "8" = "#FF0000"),
+    plot_method = "plotly")
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

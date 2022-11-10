@@ -1,0 +1,227 @@
+---
+title: "HUMAN - INTERACTION VS NO INTERACTION - DX V SEX"
+output: html_notebook
+---
+```{r}
+###################DATA SETS
+############################
+############################
+#MAC
+qPCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - qPCR.csv")
+############################
+#MICROSOFT ("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/")
+############################
+#qPCR <-read.csv("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR.csv")
+```
+
+
+```{r}
+nqPCR <- qPCR[order(qPCR$SPECIES),]
+hPCR <- nqPCR[1:24,]
+mPCR <- nqPCR[25:48,]
+mCERKL	<-	mPCR$CERKL
+mCHRNA10	<-	mPCR$CHRNA10
+mFA2H	<-	mPCR$FA2H
+mSMYD1	<-	mPCR$SMYD1
+mCLIC4	<-	mPCR$CLIC4
+mCOL4A1	<-	mPCR$COL4A1
+mFAM189A1	<-	mPCR$FAM189A1
+mPTGDR	<-	mPCR$PTGDR
+mSDCCAG8	<-	mPCR$SDCCAG8
+mTF	<-	mPCR$TF
+hCERKL	<-	hPCR$CERKL
+hCHRNA10	<-	hPCR$CHRNA10
+hFA2H	<-	hPCR$FA2H
+hSMYD1	<-	hPCR$SMYD1
+hCLIC4	<-	hPCR$CLIC4
+hCOL4A1	<-	hPCR$COL4A1
+hFAM189A1	<-	hPCR$FAM189A1
+hPTGDR	<-	hPCR$PTGDR
+hSDCCAG8	<-	hPCR$SDCCAG8
+hTF	<-	hPCR$TF
+```
+
+
+```{r}
+############################
+############################
+############################
+#HUMAN VS MOUSE DATASET
+############################
+############################
+############################
+t2PCR <- qPCR[1:48,]
+#HUMAN VS RAT PCR - 48 TOTAL - SORTED
+HVMPCR <- t2PCR[order(t2PCR$SPECIES, t2PCR$DX,t2PCR$SEX ),]
+############################
+# HUMAN PORTION OF PCR DATA
+############################
+############################
+hlabst2pcr <- HVMPCR[1:24,1:3] #CATEGORICAL DATA
+ht2pcr <- HVMPCR[1:24,4:13] # NUMERICAL DATA
+############################
+############################
+############################
+# NUMERICAL DATA TRANSFORMATION
+############################
+############################
+h_cor <- fx(ht2pcr)
+############################
+# DATA FRAME 
+############################
+hpcr_nor <- data.frame(hlabst2pcr, h_cor)
+############################
+############################
+hcor_sex <- hpcr_nor$SEX
+hcor_dx <- hpcr_nor$DX
+hcor_spec <- hpcr_nor$SPECIES
+h_nor_CERKL	<-	hpcr_nor$CERKL
+h_nor_CHRNA10	<-	hpcr_nor$CHRNA10
+h_nor_FA2H	<-	hpcr_nor$FA2H
+h_nor_SMYD1	<-	hpcr_nor$SMYD1
+h_nor_CLIC4	<-	hpcr_nor$CLIC4
+h_nor_COL4A1	<-	hpcr_nor$COL4A1
+h_nor_FAM189A1	<-	hpcr_nor$FAM189A1
+h_nor_PTGDR	<-	hpcr_nor$PTGDR
+h_nor_SDCCAG8	<-	hpcr_nor$SDCCAG8
+h_nor_TF	<-	hpcr_nor$TF
+############################
+############################
+```
+
+
+```{r}
+############################
+######HUMAN NORMALIZED GENES
+############################
+shapiro.test	(	h_nor_CERKL	)
+shapiro.test	(	h_nor_CHRNA10	)
+shapiro.test	(	h_nor_FA2H	)
+shapiro.test	(	h_nor_SMYD1	)
+shapiro.test	(	h_nor_CLIC4	)
+shapiro.test	(	h_nor_COL4A1	) ############# NON PARAMETRIC
+shapiro.test	(	h_nor_FAM189A1	)
+shapiro.test	(	h_nor_PTGDR	)
+shapiro.test	(	h_nor_SDCCAG8	)
+shapiro.test	(	h_nor_TF	)
+
+############################
+############################
+```
+
+
+```{r}
+############################
+############################
+############################
+#HUMAN DATASET INTERACTION
+############################
+############################
+anova(lm(h_nor_CERKL~hcor_dx))	
+anova(lm(h_nor_CHRNA10~hcor_dx))	
+anova(lm(h_nor_FA2H~hcor_dx))	
+anova(lm(h_nor_SMYD1~hcor_dx))	
+anova(lm(h_nor_CLIC4~hcor_dx))	
+#anova(lm(h_nor_COL4A1~hcor_dx))	
+anova(lm(h_nor_FAM189A1~hcor_dx))	
+anova(lm(h_nor_PTGDR~hcor_dx))	
+anova(lm(h_nor_SDCCAG8~hcor_dx))	
+anova(lm(h_nor_TF~hcor_dx))	
+
+
+#h_nor_CERKL  - P < 0.05  ( p =  0.01821)
+#h_nor_FA2H   - P < 0.05  ( p =  0.01607)
+#h_nor_PTGDR - P < 0.10  ( p =  0.07065 )
+
+
+
+```
+
+
+```{r}
+anova(lm(h_nor_CERKL~hcor_dx*hcor_sex))
+anova(lm(h_nor_CHRNA10~hcor_dx*hcor_sex))
+anova(lm(h_nor_FA2H~hcor_dx*hcor_sex))
+anova(lm(h_nor_SMYD1~hcor_dx*hcor_sex))
+anova(lm(h_nor_CLIC4~hcor_dx*hcor_sex))
+#anova(lm(h_nor_COL4A1~hcor_dx*hcor_sex))
+anova(lm(h_nor_FAM189A1~hcor_dx*hcor_sex))
+anova(lm(h_nor_PTGDR~hcor_dx*hcor_sex))
+anova(lm(h_nor_SDCCAG8~hcor_dx*hcor_sex))
+anova(lm(h_nor_TF~hcor_dx*hcor_sex))
+
+
+#h_nor_CERKL  - P < 0.05  ( p =  0.01821)
+#h_nor_FA2H   - P < 0.05  ( p =  0.01607)
+#h_nor_PTGDR - P < 0.10  ( p =  0.07065 )
+
+```
+
+
+```{r}
+TukeyHSD(aov(h_nor_CERKL~hcor_dx))
+TukeyHSD(aov(h_nor_CHRNA10~hcor_dx))
+TukeyHSD(aov(h_nor_FA2H~hcor_dx))
+TukeyHSD(aov(h_nor_SMYD1~hcor_dx))
+TukeyHSD(aov(h_nor_CLIC4~hcor_dx))
+#TukeyHSD(aov(h_nor_COL4A1~hcor_dx))
+TukeyHSD(aov(h_nor_FAM189A1~hcor_dx))
+TukeyHSD(aov(h_nor_PTGDR~hcor_dx))
+TukeyHSD(aov(h_nor_SDCCAG8~hcor_dx))
+TukeyHSD(aov(h_nor_TF~hcor_dx))
+
+```
+```{r}
+############################
+############################
+#inter.model <- (aov(genes_PCR$FA2H~genes_PCR$DX*genes_PCR$SPECIES))
+#no.inter.model <- (aov(genes_PCR$FA2H~genes_PCR$DX+genes_PCR$SPECIES))
+#anova(inter.model,no.inter.model)
+############################
+############################
+inter.model_CERKL<-(aov(h_nor_CERKL~hcor_dx*hcor_sex))
+inter.model_CHRNA10<-(aov(h_nor_CHRNA10~hcor_dx*hcor_sex))
+inter.model_FA2H<-(aov(h_nor_FA2H~hcor_dx*hcor_sex))
+inter.model_SMYD1<-(aov(h_nor_SMYD1~hcor_dx*hcor_sex))
+inter.model_CLIC4<-(aov(h_nor_CLIC4~hcor_dx*hcor_sex))
+#inter.model_COL4A1<-(aov(h_nor_COL4A1~hcor_dx*hcor_sex))
+inter.model_FAM189A1<-(aov(h_nor_FAM189A1~hcor_dx*hcor_sex))
+inter.model_PTGDR<-(aov(h_nor_PTGDR~hcor_dx*hcor_sex))
+inter.model_SDCCAG8<-(aov(h_nor_SDCCAG8~hcor_dx*hcor_sex))
+inter.model_TF<-(aov(h_nor_TF~hcor_dx*hcor_sex))
+############################
+############################
+no.inter.model_CERKL<-(aov(h_nor_CERKL~hcor_dx+hcor_sex))
+no.inter.model_CHRNA10<-(aov(h_nor_CHRNA10~hcor_dx+hcor_sex))
+no.inter.model_FA2H<-(aov(h_nor_FA2H~hcor_dx+hcor_sex))
+no.inter.model_SMYD1<-(aov(h_nor_SMYD1~hcor_dx+hcor_sex))
+no.inter.model_CLIC4<-(aov(h_nor_CLIC4~hcor_dx+hcor_sex))
+#no.inter.model_COL4A1<-(aov(h_nor_COL4A1~hcor_dx+hcor_sex))
+no.inter.model_FAM189A1<-(aov(h_nor_FAM189A1~hcor_dx+hcor_sex))
+no.inter.model_PTGDR<-(aov(h_nor_PTGDR~hcor_dx+hcor_sex))
+no.inter.model_SDCCAG8<-(aov(h_nor_SDCCAG8~hcor_dx+hcor_sex))
+no.inter.model_TF<-(aov(h_nor_TF~hcor_dx+hcor_sex))
+############################
+############################
+anova(inter.model_CERKL,no.inter.model_CERKL)
+anova(inter.model_CHRNA10,no.inter.model_CHRNA10)
+anova(inter.model_FA2H,no.inter.model_FA2H)
+anova(inter.model_SMYD1,no.inter.model_SMYD1)
+anova(inter.model_CLIC4,no.inter.model_CLIC4)
+#anova(inter.model_COL4A1,no.inter.model_COL4A1)
+anova(inter.model_FAM189A1,no.inter.model_FAM189A1)
+anova(inter.model_PTGDR,no.inter.model_PTGDR)
+anova(inter.model_SDCCAG8,no.inter.model_SDCCAG8)
+anova(inter.model_TF,no.inter.model_TF)
+############################
+############################
+
+
+#Model 1: h_nor_FA2H ~ hcor_dx * hcor_sex
+#Model 2: h_nor_FA2H ~ hcor_dx + hcor_sex
+# p- 0.05782 .
+
+############################
+############################
+```
+
