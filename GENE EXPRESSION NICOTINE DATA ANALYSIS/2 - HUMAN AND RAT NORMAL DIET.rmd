@@ -1,0 +1,325 @@
+---
+title: "STATISTICAL ANALYSIS OF HUMAN AND RAT GENES ASSOC. W/ NICOTINE USE"
+output: html_notebook
+---
+
+
+```{r}
+###################DATA SETS
+############################
+############################
+#######MAC - "/Volumes/F4L SWBB/R STUDIO/qPCR all values - qPCR.csv"
+############################
+#qPCR.csv
+#qPCR <-read.csv("/Volumes/F4L SWBB/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR.csv")
+#HUMAN
+#H_qPCR <-read.csv("/Volumes/F4L SWBB/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR - HUMAN.csv")
+# JUST RELEVANT GENES (4) (16 C vs 8 N) # LOWER HALF
+#R2_qPCR <-read.csv("/Volumes/F4L SWBB/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR - RAT - 2.csv")
+#ALL RAT GENES W/ FULL READINGS # UPPER HALF
+#R_qPCR <-read.csv("/Volumes/F4L SWBB/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR - RAT.csv")
+# ALL RAT GENES W/ SOME MISSING READINGS # BOTH HALVES
+#A_R_qPCR <-read.csv("/Volumes/F4L SWBB/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR DATA - ALLRAT.csv") 
+############################
+#####MICROSOFT
+############################
+############################
+#"X:/R STUDIO/qPCR all values - qPCR.csv"
+############################ 
+#qPCR <-read.csv("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR.csv")
+#H_qPCR <-read.csv("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR - HUMAN.csv")
+#R2_qPCR <-read.csv("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR - RAT - 2.csv") # JUST RELEVANT GENES #(4) (16 C vs 8 N)
+#R_qPCR <-read.csv("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR - RAT.csv") #ALL GENES W/ READINGS
+#A_R_qPCR <-read.csv("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR DATA - ALLRAT.csv") # ALL GENES W/ #SOME MISSING READINGS
+############################ 
+############################ #/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/
+############################
+qPCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - qPCR.csv")
+H_qPCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - qPCR - HUMAN.csv")
+R2_qPCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - qPCR - RAT - 2.csv") # JUST RELEVANT GENES #(4) (16 C vs 8 N)
+R_qPCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - qPCR - RAT.csv") #ALL GENES W/ READINGS
+A_R_qPCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - qPCR DATA - ALLRAT.csv") # ALL GENES W/ #SOME MISSING READINGS
+```
+
+```{r}
+hpcr_nor
+CERKL_h1	<-	hpcr_nor$CERKL
+CHRNA10_h1	<-	hpcr_nor$CHRNA10
+FA2H_h1	<-	hpcr_nor$FA2H
+SMYD1_h1	<-	hpcr_nor$SMYD1
+CLIC4_h1	<-	hpcr_nor$CLIC4
+COL4A1_h1	<-	hpcr_nor$COL4A1
+FAM189A1_h1	<-	hpcr_nor$FAM189A1
+PTGDR_h1	<-	hpcr_nor$PTGDR
+SDCCAG8_h1	<-	hpcr_nor$SDCCAG8
+TF_h1	<-	hpcr_nor$TF
+```
+
+
+```{r}
+############################
+##HUMAN DATA - BOXPLOT - GOOD DISTRIBUTION
+############################
+par(mfrow=c(2,2))
+y_hum <- c(-2,2)
+############################
+boxplot(CERKL_h1, ylim=y_hum, main="CERKL_h1")
+boxplot(CHRNA10_h1, ylim=y_hum, main="CHRNA10_h1")
+boxplot(FA2H_h1, ylim=y_hum, main="FA2H_h1")
+boxplot(SMYD1_h1, ylim=y_hum, main="SMYD1_h1")
+boxplot(CLIC4_h1, ylim=y_hum, main="CLIC4_h1")
+#boxplot(COL4A1_h1, ylim=y_hum, main="COL4A1_h1")
+boxplot(FAM189A1_h1, ylim=y_hum, main="FAM189A1_h1")
+boxplot(PTGDR_h1, ylim=y_hum, main="PTGDR_h1")
+boxplot(SDCCAG8_h1, ylim=y_hum, main="SDCCAG8_h1")
+boxplot(TF_h1, ylim=y_hum, main="TF_h1")
+```
+
+
+```{r}
+############################
+##HUMAN DATA - ANOVA = FOLD CHANGE VS TREATMENT
+############################
+intrxn.mod_1	<-	lm(	CERKL_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+intrxn.mod_2	<-	lm(	CHRNA10_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+intrxn.mod_3	<-	lm(	FA2H_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+intrxn.mod_4	<-	lm(	SMYD1_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+intrxn.mod_5	<-	lm(	CLIC4_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+#intrxn.mod_6	<-	lm(	COL4A1_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+intrxn.mod_7	<-	lm(	FAM189A1_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+intrxn.mod_8	<-	lm(	PTGDR_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+intrxn.mod_9	<-	lm(	SDCCAG8_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+intrxn.mod_10	<-	lm(	TF_h1~hpcr_nor$DX*hpcr_nor$SEX	)
+anova(	intrxn.mod_1	)
+anova(	intrxn.mod_2	)
+anova(	intrxn.mod_3	)
+anova(	intrxn.mod_4	)
+anova(	intrxn.mod_5	)
+#anova(	intrxn.mod_6	)
+anova(	intrxn.mod_7	)
+anova(	intrxn.mod_8	)
+anova(	intrxn.mod_9	)
+anova(	intrxn.mod_10	)
+```
+
+
+
+```{r}
+no.intrxn.mod_1	<-	lm(	CERKL_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+no.intrxn.mod_2	<-	lm(	CHRNA10_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+no.intrxn.mod_3	<-	lm(	FA2H_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+no.intrxn.mod_4	<-	lm(	SMYD1_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+no.intrxn.mod_5	<-	lm(	CLIC4_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+#no.intrxn.mod_6	<-	lm(	COL4A1_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+no.intrxn.mod_7	<-	lm(	FAM189A1_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+no.intrxn.mod_8	<-	lm(	PTGDR_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+no.intrxn.mod_9	<-	lm(	SDCCAG8_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+no.intrxn.mod_10	<-	lm(	TF_h1~hpcr_nor$DX+hpcr_nor$SEX	)
+anova(	no.intrxn.mod_1	)
+anova(	no.intrxn.mod_2	)
+anova(	no.intrxn.mod_3	)
+anova(	no.intrxn.mod_4	)
+anova(	no.intrxn.mod_5	)
+#anova(	no.intrxn.mod_6	)
+anova(	no.intrxn.mod_7	)
+anova(	no.intrxn.mod_8	)
+anova(	no.intrxn.mod_9	)
+anova(	no.intrxn.mod_10	)
+```
+
+```{r}
+aov_residuals1	<-	residuals(	intrxn.mod_1	)
+aov_residuals2	<-	residuals(	intrxn.mod_2	)
+aov_residuals3	<-	residuals(	intrxn.mod_3	)
+aov_residuals4	<-	residuals(	intrxn.mod_4	)
+aov_residuals5	<-	residuals(	intrxn.mod_5	)
+#aov_residuals6	<-	residuals(	intrxn.mod_6	)
+aov_residuals7	<-	residuals(	intrxn.mod_7	)
+aov_residuals8	<-	residuals(	intrxn.mod_8	)
+aov_residuals9	<-	residuals(	intrxn.mod_9	)
+aov_residuals10	<-	residuals(	intrxn.mod_10	)
+aov_residuals11	<-	residuals(	no.intrxn.mod_1	)
+aov_residuals12	<-	residuals(	no.intrxn.mod_2	)
+aov_residuals13	<-	residuals(	no.intrxn.mod_3	)
+aov_residuals14	<-	residuals(	no.intrxn.mod_4	)
+aov_residuals15	<-	residuals(	no.intrxn.mod_5	)
+#ov_residuals16	<-	residuals(	no.intrxn.mod_6	)
+aov_residuals17	<-	residuals(	no.intrxn.mod_7	)
+aov_residuals18	<-	residuals(	no.intrxn.mod_8	)
+aov_residuals19	<-	residuals(	no.intrxn.mod_9	)
+aov_residuals20	<-	residuals(	no.intrxn.mod_10	)
+shapiro.test(		aov_residuals1		)
+shapiro.test(		aov_residuals2		)
+shapiro.test(		aov_residuals3		)
+shapiro.test(		aov_residuals4		)
+shapiro.test(		aov_residuals5		)
+#shapiro.test(		aov_residuals6		)
+shapiro.test(		aov_residuals7		)
+shapiro.test(		aov_residuals8		)
+shapiro.test(		aov_residuals9		)
+shapiro.test(		aov_residuals10		)
+shapiro.test(		aov_residuals11		)
+shapiro.test(		aov_residuals12		)
+shapiro.test(		aov_residuals13		)
+shapiro.test(		aov_residuals14		)
+shapiro.test(		aov_residuals15		)
+#shapiro.test(		aov_residuals16		)
+shapiro.test(		aov_residuals17		)
+shapiro.test(		aov_residuals18		)
+shapiro.test(		aov_residuals19		)
+shapiro.test(		aov_residuals20		)
+
+```
+
+
+```{r}
+
+
+anova(intrxn.mod_1, no.intrxn.mod_1)
+anova(intrxn.mod_2, no.intrxn.mod_2)
+anova(intrxn.mod_3, no.intrxn.mod_3)
+anova(intrxn.mod_4, no.intrxn.mod_4)
+anova(intrxn.mod_5, no.intrxn.mod_5)
+#anova(intrxn.mod_6, no.intrxn.mod_6)
+anova(intrxn.mod_7, no.intrxn.mod_7)
+anova(intrxn.mod_8, no.intrxn.mod_8)
+anova(intrxn.mod_9, no.intrxn.mod_9)
+anova(intrxn.mod_10, no.intrxn.mod_10)
+
+```
+
+
+```{r}
+#h1~hpcr_nor$DX
+anova(lm(CERKL_h1~hpcr_nor$SEX))
+anova(lm(CHRNA10_h1~hpcr_nor$SEX))
+anova(lm(FA2H_h1~hpcr_nor$SEX))
+anova(lm(SMYD1_h1~hpcr_nor$SEX))
+anova(lm(CLIC4_h1~hpcr_nor$SEX))
+#anova(lm(COL4A1_h1~hpcr_nor$SEX))
+anova(lm(FAM189A1_h1~hpcr_nor$SEX))
+anova(lm(PTGDR_h1~hpcr_nor$SEX))
+anova(lm(SDCCAG8_h1~hpcr_nor$SEX))
+anova(lm(TF_h1~hpcr_nor$SEX))
+```
+
+
+
+
+```{r}
+anova(lm(CERKL_h1~hpcr_nor$DX))
+anova(lm(CHRNA10_h1~hpcr_nor$DX))
+anova(lm(FA2H_h1~hpcr_nor$DX))
+anova(lm(SMYD1_h1~hpcr_nor$DX))
+anova(lm(CLIC4_h1~hpcr_nor$DX))
+#anova(lm(COL4A1_h1~hpcr_nor$DX))
+anova(lm(FAM189A1_h1~hpcr_nor$DX))
+anova(lm(PTGDR_h1~hpcr_nor$DX))
+anova(lm(SDCCAG8_h1~hpcr_nor$DX))
+anova(lm(TF_h1~hpcr_nor$DX))
+```
+
+```{r}
+############################
+##HUMAN DATA - TUKEY POST HOC
+############################
+TukeyHSD(aov(CERKL_h1~hpcr_nor$DX))
+TukeyHSD(aov(CHRNA10_h1~hpcr_nor$DX))
+TukeyHSD(aov(FA2H_h1~hpcr_nor$DX))
+TukeyHSD(aov(SMYD1_h1~hpcr_nor$DX))
+TukeyHSD(aov(CLIC4_h1~hpcr_nor$DX))
+#TukeyHSD(aov(COL4A1_h1~hpcr_nor$DX))
+TukeyHSD(aov(FAM189A1_h1~hpcr_nor$DX))
+TukeyHSD(aov(PTGDR_h1~hpcr_nor$DX))
+TukeyHSD(aov(SDCCAG8_h1~hpcr_nor$DX))
+TukeyHSD(aov(TF_h1~hpcr_nor$DX))
+```
+
+
+```{r}
+A_R_qPCR
+```
+
+```{r}
+############################
+##RAT DATA NORMALIZATION R- ALL 4 RELEVANT GENES - 24 SAMPLES W / NORMAL DIET
+############################
+
+library(dplyr)
+Rpcr_A <- A_R_qPCR[,3:14]
+RApcr_labs <- Rpcr_A[,1:2]
+RApcr_dat <- Rpcr_A[,3:12]
+RApcr_dat_2 <- select(RApcr_dat, -CLIC4, - COL4A1, - FAM189A1, -PTGDR, -SDCCAG8, -TF)
+RApcr_cor_dat <- fx2(RApcr_dat_2)
+RApcr_nor <- data.frame(RApcr_labs,RApcr_cor_dat) #NORMALIZED BY SCALE
+
+##NON PARAMETRIC VARIABLES, NEED TO BE TESTED NON PARAMETRICALLY
+
+
+CERKL_RA	<-	(RApcr_nor$CERKL)
+CHRNA10_RA	<-	(RApcr_nor$CHRNA10)
+FA2H_RA	<-	(RApcr_nor$FA2H)
+SMYD1_RA	<-	(RApcr_nor$SMYD1)
+
+##NON PARAMETRIC VARIABLES, NEED TO BE TESTED NON PARAMETRICALLY
+
+shapiro.test	(	CERKL_RA	)
+shapiro.test	(	CHRNA10_RA	)
+shapiro.test	(	FA2H_RA	)
+shapiro.test	(	SMYD1_RA	)
+
+A_R_qPCR
+RApcr_nor
+```
+
+```{r}
+anova(lm(RApcr_nor$CERKL~RApcr_nor$DX))
+anova(lm(RApcr_nor$CHRNA10~RApcr_nor$DX))
+anova(lm(RApcr_nor$FA2H~RApcr_nor$DX))
+anova(lm(RApcr_nor$SMYD1~RApcr_nor$DX))
+```
+
+
+```{r}
+#NO SIGNIFICANT SEX INFLUENCE
+anova(lm(RApcr_nor$CERKL~RApcr_nor$SEX))
+anova(lm(RApcr_nor$CHRNA10~RApcr_nor$SEX))
+anova(lm(RApcr_nor$FA2H~RApcr_nor$SEX))
+anova(lm(RApcr_nor$SMYD1~RApcr_nor$SEX))
+```
+
+
+```{r}
+anova(lm(RApcr_nor$CERKL~RApcr_nor$DX*RApcr_nor$SEX))
+anova(lm(RApcr_nor$CHRNA10~RApcr_nor$DX*RApcr_nor$SEX))
+anova(lm(RApcr_nor$FA2H~RApcr_nor$DX*RApcr_nor$SEX))
+anova(lm(RApcr_nor$SMYD1~RApcr_nor$DX*RApcr_nor$SEX))
+```
+
+
+```{r}
+anova(lm(RApcr_nor$CERKL~RApcr_nor$DX+RApcr_nor$SEX))
+anova(lm(RApcr_nor$CHRNA10~RApcr_nor$DX+RApcr_nor$SEX))
+anova(lm(RApcr_nor$FA2H~RApcr_nor$DX+RApcr_nor$SEX))
+anova(lm(RApcr_nor$SMYD1~RApcr_nor$DX+RApcr_nor$SEX))
+```
+
+
+```{r}
+RApcr_nor
+
+rat_intrxn.mod_1<- lm(RApcr_nor$CERKL~RApcr_nor$DX*RApcr_nor$SEX)		
+rat_intrxn.mod_2<- lm(RApcr_nor$CHRNA10~RApcr_nor$DX*RApcr_nor$SEX)		
+rat_intrxn.mod_3<- lm(RApcr_nor$FA2H~RApcr_nor$DX*RApcr_nor$SEX)		
+rat_intrxn.mod_4<- lm(RApcr_nor$SMYD1~RApcr_nor$DX*RApcr_nor$SEX)		
+		
+rat_no.intrxn.mod_1<- lm(RApcr_nor$CERKL~RApcr_nor$DX+RApcr_nor$SEX)		
+rat_no.intrxn.mod_2<- lm(RApcr_nor$CHRNA10~RApcr_nor$DX+RApcr_nor$SEX)		
+rat_no.intrxn.mod_3<- lm(RApcr_nor$FA2H~RApcr_nor$DX+RApcr_nor$SEX)		
+rat_no.intrxn.mod_4<- lm(RApcr_nor$SMYD1~RApcr_nor$DX+RApcr_nor$SEX)
+		
+anova(rat_intrxn.mod_1, rat_no.intrxn.mod_1)		
+anova(rat_intrxn.mod_2, rat_no.intrxn.mod_2)		
+anova(rat_intrxn.mod_3, rat_no.intrxn.mod_3)		
+anova(rat_intrxn.mod_4, rat_no.intrxn.mod_4)		
+```

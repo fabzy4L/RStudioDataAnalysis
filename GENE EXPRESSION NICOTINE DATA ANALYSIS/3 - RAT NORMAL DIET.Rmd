@@ -1,0 +1,265 @@
+---
+title: "RAT - INTERACTION VS NO INTERACTION - DX V SEX"
+output: html_notebook
+---
+```{r}
+###################DATA SETS
+############################
+############################
+#MAC
+#qPCR <-read.csv("/Volumes/F4L SWBB/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR.csv")
+qPCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - qPCR.csv")
+############################
+#MICROSOFT ("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/")
+############################
+#qPCR <-read.csv("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR.csv")
+```
+
+```{r}
+############################
+# DATA FRAME 
+############################
+#mlabst2pcr <- HVMPCR[25:48,1:3] #CATEGORICAL DATA
+#mt2pcr <- HVMPCR[25:48,4:7] #NUMERICAL DATA
+mpcr_nor <- data.frame(mlabst2pcr, m_cor)
+############################
+############################
+
+############################
+############################
+# NUMERICAL DATA TRANSFORMATION
+############################
+#mt2pcr # JUST VALUES, NO LABELS, NOT TRANSFORMED
+m1_cor_CERKL <- fx2(mt2pcr$CERKL)
+m1_cor_CHRNA10 <- fx2(mt2pcr$CHRNA10)
+m1_cor_SMYD1 <- fx2(mt2pcr$SMYD1)
+
+############################
+############################
+############################
+############################
+NEWNORM <- data.frame(m1_cor_CERKL, m1_cor_CHRNA10,m1_cor_SMYD1)
+cor_fx_dat <- data.frame(mlabst2pcr, NEWNORM)
+
+#cor_fx_dat$m1_cor_CHRNA10
+#cor_fx_dat$m1_cor_SMYD1
+
+```
+
+
+```{r}
+
+shapiro.test	(	mpcr_nor$CERKL	) 
+shapiro.test	(	cor_fx_dat$m1_cor_CHRNA10	) ############# DIFF NORM
+shapiro.test	(	mpcr_nor$FA2H	)
+shapiro.test	(	cor_fx_dat$m1_cor_SMYD1	)  ############# DIFF NORM
+############################
+############################
+shapiro.test	(	m1_cor_CHRNA10	) ############# DIFF NORM
+shapiro.test	(	m1_cor_SMYD1	) ############# DIFF NORM
+shapiro.test	(	m1_cor_CERKL	) ############# DIFF NORM
+
+
+```
+
+
+```{r}
+############################
+############################
+############################
+#RAT DATASET INTERACTION - DX
+############################
+############################
+#shapiro.test	(	m1_cor_CERKL	) 
+#shapiro.test	(	m1_cor_CHRNA10	) ############# DIFF NORM
+#shapiro.test	(	m_nor_FA2H	)
+#shapiro.test	(	m1_cor_SMYD1	)  ############# DIFF NORM
+############################
+#cor_fx_dat$m1_cor_CERKL
+#cor_fx_dat$m1_cor_SMYD1
+#cor_fx_dat$m1_cor_CHRNA10
+
+anova(lm(mpcr_nor$CERKL~mpcr_nor$DX))
+anova(lm(cor_fx_dat$m1_cor_CHRNA10~cor_fx_dat$DX))
+anova(lm(mpcr_nor$FA2H~mpcr_nor$DX))
+anova(lm(cor_fx_dat$m1_cor_SMYD1~cor_fx_dat$DX))
+############################
+
+
+```
+
+
+```{r}
+############################
+############################
+############################
+#RAT DATASET INTERACTION - SEX 
+############################
+############################
+
+anova(lm(mpcr_nor$CERKL~mpcr_nor$SEX))
+anova(lm(cor_fx_dat$m1_cor_CHRNA10~cor_fx_dat$SEX))
+anova(lm(mpcr_nor$FA2H~mpcr_nor$SEX))
+anova(lm(cor_fx_dat$m1_cor_SMYD1~cor_fx_dat$SEX))
+
+############################
+#GENE EXPRESSION OF THESE BASED ON SEX 
+#m1_cor_SMYD1  Pr(>F) 0.05731 .
+#m_nor_COL4A1  Pr(>F)   0.06181 .
+#m_nor_FAM189A1  Pr(>F)  0.01324 *
+```
+
+
+```{r}
+shapiro.test	(	m1_cor_CERKL 	)
+shapiro.test	(	m1_cor_CHRNA10   	)
+shapiro.test	(	mpcr_nor$FA2H  	)
+shapiro.test	(	m1_cor_SMYD1 	)
+shapiro.test	(	m_nor_CLIC4 	)
+shapiro.test	(	m_nor_COL4A1    	)
+shapiro.test	(	m_nor_FAM189A1  	)
+shapiro.test	(	m_nor_PTGDR 	)
+shapiro.test	(	m_nor_SDCCAG8   	)
+shapiro.test	(	m_nor_TF    	)
+```
+
+
+```{r}
+shapiro.test(m1_cor_CERKL)
+```
+
+
+```{r}
+#m_nor_TF- P < 0.05  ( p =  0.04851)
+#m_nor_FA2H   - P < 0.10  ( p =  0.09794 )
+############################
+############################
+inter.model_mCERKL<-aov(lm(m1_cor_CERKL~mcor_dx*mcor_sex))
+inter.model_mCHRNA10<-aov(lm(m1_cor_CHRNA10~mcor_dx*mcor_sex))
+inter.model_mFA2H<-aov(lm(mpcr_nor$FA2H~mpcr_nor$DX*mpcr_nor$SEX))
+inter.model_mSMYD1<-aov(lm(m1_cor_SMYD1~mcor_dx*mcor_sex))
+#inter.model_mCLIC4<-aov(lm(m_nor_CLIC4~mcor_dx*mcor_sex))
+#inter.model_mCOL4A1<-aov(lm(m_nor_COL4A1~mcor_dx*mcor_sex))
+#inter.model_mFAM189A1<-aov(lm(m_nor_FAM189A1~mcor_dx*mcor_sex))
+#inter.model_mPTGDR<-aov(lm(m_nor_PTGDR~mcor_dx*mcor_sex))
+#inter.model_mSDCCAG8<-aov(lm(m_nor_SDCCAG8~mcor_dx*mcor_sex))
+#inter.model_mTF<-aov(lm(m_nor_TF~mcor_dx*mcor_sex))
+############################
+############################
+no.inter.model_mCERKL<-aov(lm(m1_cor_CERKL~mcor_dx+mcor_sex))
+no.inter.model_mCHRNA10<-aov(lm(m1_cor_CHRNA10~mcor_dx+mcor_sex))
+no.inter.model_mFA2H<-aov(lm(mpcr_nor$FA2H~mpcr_nor$DX+mpcr_nor$SEX))
+no.inter.model_mSMYD1<-aov(lm(m1_cor_SMYD1~mcor_dx+mcor_sex))
+#no.inter.model_mCLIC4<-aov(lm(m_nor_CLIC4~mcor_dx+mcor_sex))
+#no.inter.model_mCOL4A1<-aov(lm(m_nor_COL4A1~mcor_dx+mcor_sex))
+#no.inter.model_mFAM189A1<-aov(lm(m_nor_FAM189A1~mcor_dx+mcor_sex))
+#no.inter.model_mPTGDR<-aov(lm(m_nor_PTGDR~mcor_dx+mcor_sex))
+#no.inter.model_mSDCCAG8<-aov(lm(m_nor_SDCCAG8~mcor_dx+mcor_sex))
+#no.inter.model_mTF<-aov(lm(m_nor_TF~mcor_dx+mcor_sex))
+############################
+############################
+anova(	inter.model_mCERKL	,	no.inter.model_mCERKL		)
+anova(	inter.model_mCHRNA10	,	no.inter.model_mCHRNA10		)
+anova(	inter.model_mFA2H	,	no.inter.model_mFA2H		)
+anova(	inter.model_mSMYD1	,	no.inter.model_mSMYD1		)
+#anova(	inter.model_mCLIC4	,	no.inter.model_mCLIC4		)
+#anova(	inter.model_mCOL4A1	,	no.inter.model_mCOL4A1		)
+#anova(	inter.model_mFAM189A1	,	no.inter.model_mFAM189A1		)
+#anova(	inter.model_mPTGDR	,	no.inter.model_mPTGDR		)
+#anova(	inter.model_mSDCCAG8	,	no.inter.model_mSDCCAG8		)
+#anova(	inter.model_mTF	,	no.inter.model_mTF		)
+############################
+############################
+
+
+#REMOVING SEX SIGNIFICANTLY CHANGED THESE MODELS ( THEY ARE DIFFERENT)
+
+#Model 1: m_nor_CERKL ~ mcor_dx * mcor_sex
+#Model 2: m_nor_CERKL ~ mcor_dx + mcor_sex
+# p- 0.06015 .
+
+#Model 1: m1_cor_CHRNA10 ~ mcor_dx * mcor_sex
+#Model 2: m1_cor_CHRNA10 ~ mcor_dx + mcor_sex
+# p- 0.006587 **
+
+#Model 1: m1_cor_SMYD1 ~ mcor_dx * mcor_sex
+#Model 2: m1_cor_SMYD1 ~ mcor_dx + mcor_sex
+# p- 0.04139 *
+
+#Model 1: m_nor_SDCCAG8 ~ mcor_dx * mcor_sex
+#Model 2: m_nor_SDCCAG8 ~ mcor_dx + mcor_sex
+# p- 0.02692 *
+
+############################
+############################
+```
+
+
+```{r}
+#inter.model_mCERKL<-aov(lm(m1_cor_CERKL~mcor_dx*mcor_sex))
+#inter.model_mCHRNA10<-aov(lm(m1_cor_CHRNA10~mcor_dx*mcor_sex))
+#inter.model_mFA2H<-aov(lm(m_nor_FA2H~mcor_dx*mcor_sex))
+#inter.model_mSMYD1<-aov(lm(m1_cor_SMYD1~mcor_dx*mcor_sex))
+summary(	inter.model_mCERKL	)
+```
+
+
+```{r}
+summary(	inter.model_mCHRNA10	) # NO SIGNIFICANT SEX DIFFERENCE, NO SIGNIFICANT EFFECT ON TREATMENT ALONE.HIGHLY SIGNIFICANT INFLUENCE ON GENE EXPRESSION WITH INTERACTION BETWEEN SEX AND TREATMENT.
+```
+
+
+```{r}
+NORMALDIET
+mpcr_nor
+shapiro.test(mpcr_nor$FA2H)
+shapiro.test(NORMALDIET$FA2H)
+```
+
+
+```{r}
+anova(lm(mpcr_nor$FA2H~mpcr_nor$DX*mpcr_nor$SEX))
+anova(lm(NORMALDIET$FA2H~NORMALDIET$DX*NORMALDIET$SEX))
+```
+
+
+```{r}
+inter.model_mFA2H
+summary(	inter.model_mFA2H	)
+interaction.plot(mpcr_nor$DX,mpcr_nor$SEX,mpcr_nor$FA2H, ylim=c(-1.5,1.5))
+```
+
+
+```{r}
+summary(	inter.model_mSMYD1	)# SEX DIFFERENCE, INFLUENCED BY INTERACTION WITH TREATMENT. NO SIGNIFICANT EFFECT ON TREATMENT ALONE.
+```
+
+
+```{r}
+summary(	inter.model_mCLIC4	)
+```
+
+
+```{r}
+summary(	inter.model_mCOL4A1	)
+```
+
+
+```{r}
+summary(	inter.model_mFAM189A1	) # SEX DIFFERENCE, BUT NO TREATMENT DIFFERENCES
+```
+
+
+```{r}
+summary(	inter.model_mPTGDR	)
+```
+
+
+```{r}
+summary(	inter.model_mSDCCAG8	)# TREATMENT AND SEX, MOSTLY SEX
+```
+
+
+```{r}
+summary(	inter.model_mTF	)# TREATMENT
+```
