@@ -1,0 +1,93 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(dplyr)
+qpcr_x <- qPCR[order(qPCR$SPECIES),]
+qpcr_x2 <- qpcr_x[1:48,1:7]
+qpcr_x2
+QPCR_X3 <- select(qpcr_x2, -CHRNA10, -SMYD1)
+QPCRXLABS <- QPCR_X3[,1:3]
+QPCRXDAT <- QPCR_X3[,4:5]
+cor_qpcrxdat <- fx(QPCRXDAT)
+newpcr <- data.frame(QPCRXLABS,cor_qpcrxdat)
+
+shapiro.test(newpcr$CERKL)
+shapiro.test(newpcr$FA2H)
+```
+
+
+```{r}
+newpcr
+hpcr_nor
+```
+
+
+```{r}
+shapiro.test(cor_qpcrxdat$CERKL)
+shapiro.test(cor_qpcrxdat$FA2H)
+#select(RApcr_dat, -CLIC4, - COL4A1, - FAM189A1, -PTGDR, -SDCCAG8, -TF)
+#hpcr_nor
+```
+
+
+```{r}
+cordat
+
+```
+
+
+```{r}
+webshot::install_phantomjs()
+#row_side_colors = rat_heat[,1:2], row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE),hide_colorbar=FALSE,  dpi=600
+
+#heatmaply::heatmaply(newpcr, main="ALL", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE),hide_colorbar=FALSE,  dpi=600)
+```
+
+
+```{r}
+#heatmaply::heatmaply(cordat, main="ALL", xlab="Genes", ylab="Subjects", col=c("black","red"),  row_side_palette= NCcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE),hide_colorbar=FALSE,  dpi=600, file = "C:/Users/fabiaalv/Desktop/photoshop heatmaps nicotine/FINAL/heatmaply_plot.pdf", )
+
+library(heatmaply)
+heatmaply(cordat, main="ALL", xlab="Genes", ylab="Subjects", col=c("black","red"),  row_side_palette= NCcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE),hide_colorbar=FALSE,  dpi=600)
+
+```
+
+
+```{r}
+rat_heat
+#rat_dx_heat
+
+#heatmaply(rat_heat[,-c(1,2)], main="Rat",  xlab="Genes", ylab=" ", col=c("black","red"), row_side_palette = mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), colorbar_xpos=-0.1  ,hide_colorbar=FALSE,showticklabels = c(T,F), dpi=600)
+heatmaply(cordat, main="ALL", xlab="Genes", ylab=" ", col=c("black","red"), row_side_palette = mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=FALSE, showticklabels = c(T,F), dpi=600)
+heatmaply(cordat, main="ALL", xlab="Genes", ylab=" ", col=c("black","red"), row_side_palette = mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=FALSE, showticklabels = c(T,F), dpi=600)
+
+heatmaply(human_dx_heat, main="Human", xlab="Genes", ylab=" ", col=c("black","red"), row_side_palette = NCcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=FALSE, showticklabels = c(T,F), dpi=600)
+```
+
+
+```{r}
+heatmaply(rat_dx_heat, main="Rat", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= NCcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=FALSE, dpi=600)
+heatmaply(rat_dx_heat, main="Rat", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= NCcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=TRUE, dpi=600)
+```
+
+
+```{r}
+heatmaply::heatmaply(rat_dx_heat, main="Rat", xlab="Genes", ylab=" ", col=c("black","red"), row_side_palette = NCcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=FALSE, showticklabels = c(T,F), dpi=600)
+
+#heatmaply::heatmaply(human_heat, main="Human", xlab="Genes", ylab=" ", col=c("black","red"), row_side_palette = mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), colorbar_xpos=-0.1  ,hide_colorbar=FALSE,showticklabels = c(T,F), dpi=600)
+```
+
+
+```{r}
+heatmaply::heatmaply(newpcr, main="All", xlab="Genes", ylab=" ", col=c("black","red"),  row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=TRUE,showticklabels = c(T,F), dpi=600)
+heatmaply::heatmaply(human_heat, main="Human", xlab="Genes", ylab="Subjects", col=c("black","red"),  row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=FALSE, showticklabels = c(T,F),dpi=600)
+
+
+```

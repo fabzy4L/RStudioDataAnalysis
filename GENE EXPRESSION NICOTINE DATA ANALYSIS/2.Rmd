@@ -1,0 +1,86 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+par(mfrow=c(1,2))
+################################################################################################################################################################################################
+################################################################################################################################################################################################
+interaction.plot(humanPCR$DX,humanPCR$SEX,h_CERKL, xlab="DX",  ylab="CERKL", main="Human", ylim = c(-1.5,1.5),cex.axis = 0.8, legend=0 ,  col = c("pink", "blue"), lwd=2.0, pch=c(1,1) ,xpd = F, trace.label = "SEX")
+################################
+legend("topright", lwd=2.0,  legend = c("F","M"), lty=c(2,1), col = c("pink", "blue"))
+################################
+points(1,0.1760688)#control- F
+points(1,0.1024853)#control- M
+################################
+points(2,-0.1592801)#N- F
+points(2,-0.1003921 )#N- M
+```
+
+
+```{r}
+################################################################################################################################################################################################
+################################################################################################################################################################################################
+interaction.plot(humanPCR$DX,humanPCR$SEX,h_FA2H, xlab="DX", ylab="FA2H", main="Human", ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lty=1, lwd=2.0,xpd = F , trace.label = "SEX")
+################################
+legend("topleft", lwd=2.0, legend = c("F","M"), lty=c(1,1), col = c("pink", "blue"))
+################################
+#points(1,-0.4844082)#control- F
+#points(1,-1.0720316)#control- M
+################################
+#points(2, -0.4617534 )#N- F
+#points(2,-0.4392237)#N- M
+################################
+```
+
+
+```{r}
+library(ggplot2)
+library(readxl)
+library(data.table)
+library(lme4)
+library(emmeans)
+
+#data_path <- "../data"
+folder <- "Data from Synergistic interaction between UVB radiation and temperature increases susceptibility to parasitic infection in a fish"
+filename <- "Cramp et al raw data.xlsx"
+file_path <- paste(data_path, folder, filename, sep="/")
+fish <- data.table(read_excel(file_path, sheet="Infection Intensity"))
+setnames(fish, old=colnames(fish), new=c("UV", "Temp", "Tank", "Whitespots"))
+fish[, UV:=factor(UV, c("Low", "High"))]
+fish[, Temp:=factor(Temp)]
+gg <- gg_interaction(x=c("UV", "Temp"), y="Whitespots", random="Tank", data=fish)
+gg
+```
+
+
+```{r}
+################################################################################################################################################################################################
+################################################################################################################################################################################################
+interaction.plot(humanPCR$DX,humanPCR$SEX,h_CERKL, xlab="DX", ylab="CERKL", main="Human", ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lty=1, lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+################################
+legend("topleft", lwd=2.0, legend = c("F","M"), lty=c(1,1), col = c("pink", "blue"))
+################################
+#points(1,-0.4844082)#control- F
+#points(1,-1.0720316)#control- M
+################################
+#points(2, -0.4617534 )#N- F
+#points(2,-0.4392237)#N- M
+################################
+
+
+
+
+```
+
+
+
+
+
+```
+

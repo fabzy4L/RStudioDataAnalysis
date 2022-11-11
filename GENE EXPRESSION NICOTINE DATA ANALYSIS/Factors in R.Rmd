@@ -1,0 +1,116 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+# NOT RUN {
+(ff <- factor(substring("statistics", 1:10, 1:10), levels = letters))
+```
+
+
+```{r}
+as.integer(ff)      # the internal codes
+```
+
+
+```{r}
+# drops the levels that do not occur
+(f. <- factor(ff))
+
+
+# the same, more transparently
+ff[, drop = TRUE]  
+```
+```{r}
+factor(letters[1:20], labels = "letter")
+```
+
+
+```{r}
+class(ordered(4:1)) # "ordered", inheriting from "factor"
+```
+
+
+```{r}
+z <- factor(LETTERS[3:1], ordered = TRUE)
+## and "relational" methods work:
+stopifnot(sort(z)[c(1,3)] == range(z), min(z) < max(z))
+# }
+```
+
+
+```{r}
+# NOT RUN {
+## suppose you want "NA" as a level, and to allow missing values.
+(x <- factor(c(1, 2, NA), exclude = NULL))  #INSTEAD OF NULL YOU CAN PUT NA
+```
+
+
+```{r}
+is.na(x)[2] <- TRUE
+x  # [1] 1    <NA> <NA>
+```
+
+
+```{r}
+is.na(x)
+# [1] FALSE  TRUE FALSE
+```
+
+
+```{r}
+## More rational, since R 3.4.0 :
+factor(c(1:2, NA), exclude =  "" ) # keeps <NA> , as
+factor(c(1:2, NA), exclude = NULL) # always did
+## exclude = <character>
+z # ordered levels 'A < B < C'
+factor(z, exclude = "C") # does exclude
+factor(z, exclude = "B") # ditto
+```
+
+
+```{r}
+## Now, labels maybe duplicated:
+## factor() with duplicated labels allowing to "merge levels"
+x <- c("Man", "Male", "Man", "Lady", "Female")
+## Map from 4 different values to only two levels:
+(xf <- factor(x, levels = c("Male", "Man" , "Lady",   "Female"),
+                 labels = c("Male", "Male", "Female", "Female")))
+#> [1] Male   Male   Male   Female Female
+#> Levels: Male Female
+```
+
+
+```{r}
+## Using addNA()
+Month <- airquality$Month
+table(addNA(Month))
+table(Month)
+```
+
+
+```{r}
+table(addNA(Month, ifany = TRUE))
+# }
+
+
+
+
+
+
+```
+
+
+```{r}
+
+
+
+
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

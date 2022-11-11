@@ -1,0 +1,193 @@
+---
+title: "qPCR"
+output: html_notebook
+---
+```{r}
+###################DATA SETS
+############################
+############################
+#MAC
+qPCR <-read.csv("/Users/f4L/Documents/GitHub/RStudioDataAnalysis/GENE EXPRESSION NICOTINE DATA ANALYSIS/qPCR all values - qPCR.csv")
+############################
+#MICROSOFT
+############################
+#qPCR <-read.csv("E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/qPCR all values - qPCR.csv")
+```
+
+
+```{r}
+############################
+################ SUBSETS - HUMAN & NORMAL DIET RAT
+############################
+nqPCR <- qPCR[order(qPCR$SPECIES),]
+hPCR <- nqPCR[1:24,]
+mPCR <- nqPCR[25:48,]
+```
+
+
+```{r}
+############################
+#########FUNCTIONS
+############################
+fx_z <- function(gene) {
+  gene_std <- (gene - (mean(gene)))/(sd(gene))
+  return(gene_std)
+}
+############################
+############################
+############################
+fx <- function(gene) {
+  gene_std <- log10(gene)
+  return(gene_std)
+}
+############################
+############################
+############################
+fx1 <- function(gene) {
+  gene_std <- (gene - (mean(gene)))/(sd(gene))
+  return(gene_std)
+}
+############################
+############################
+############################
+fx2 <- function(gene) {
+  gene_std <- scale(gene)
+  return(gene_std)
+}
+############################
+############################
+############################
+fx3 <- function(gene) {
+  gene_std <- (gene)^(-1/2)
+  return(gene_std)
+}
+############################
+############################
+fx4 <- function(gene) {
+  gene_std <- log(gene)
+  return(gene_std)
+}
+############################
+#########NEW FUNCTIONS
+############################
+############################
+fx5 <- function(gene) { 
+  gene <- (gene - min(gene)) / (max(gene) - min(gene))
+  return (gene) 
+}
+```
+
+
+```{r}
+############################
+############################
+mfcol <- colorRampPalette(c('pink','blue')) # Bi color palette function to be used in sidebar 
+NCcol <- colorRampPalette(c('light gray','dark gray')) # Bi color palette function to be used in sidebar 
+############################
+############################
+
+```
+
+
+```{r}
+############################
+############################
+############################
+#HUMAN VS MOUSE DATASET - NORMAL DIET
+############################
+############################
+############################
+t2PCR <- qPCR[1:48,] # NORMAL DIET
+#HUMAN VS RAT PCR - 48 TOTAL - SORTED
+HVMPCR <- t2PCR[order(t2PCR$SPECIES, t2PCR$DX,t2PCR$SEX ),]
+############################
+# HUMAN PORTION OF PCR DATA
+############################
+############################
+hlabst2pcr <- HVMPCR[1:24,1:3] #CATEGORICAL DATA
+ht2pcr <- HVMPCR[1:24,4:13] # NUMERICAL DATA
+############################
+############################
+############################
+# RAT PORTION OF PCR DATA
+############################
+############################
+mlabst2pcr <- HVMPCR[25:48,1:3] #CATEGORICAL DATA
+mt2pcr <- HVMPCR[25:48,4:13] #NUMERICAL DATA
+############################
+############################
+############################
+# NUMERICAL DATA TRANSFORMATION
+############################
+############################
+h_cor <- fx(ht2pcr)
+m_cor <- fx(mt2pcr)
+CHRNA10_mcor_2 <- fx_z(mt2pcr$CHRNA10)
+SMYD1_mcor_2 <- fx_z(mt2pcr$SMYD1)
+############################
+# DATA FRAME 
+############################
+hpcr_nor <- data.frame(hlabst2pcr, h_cor)
+mpcr_nor <- data.frame(mlabst2pcr, m_cor)
+############################
+############################
+hcor_sex <- hpcr_nor$SEX
+hcor_dx <- hpcr_nor$DX
+CERKL_h1	<-	hpcr_nor$CERKL
+CHRNA10_h1	<-	hpcr_nor$CHRNA10
+FA2H_h1	<-	hpcr_nor$FA2H
+SMYD1_h1	<-	hpcr_nor$SMYD1
+CLIC4_h1	<-	hpcr_nor$CLIC4
+COL4A1_h1	<-	hpcr_nor$COL4A1
+FAM189A1_h1	<-	hpcr_nor$FAM189A1
+PTGDR_h1	<-	hpcr_nor$PTGDR
+SDCCAG8_h1	<-	hpcr_nor$SDCCAG8
+TF_h1	<-	hpcr_nor$TF
+############################
+############################
+mcor_sex <- mpcr_nor$SEX
+mcor_dx <- mpcr_nor$DX
+mcor_spec <- mpcr_nor$SPECIES
+m_nor_CERKL <-  mpcr_nor$CERKL
+m_nor_CHRNA10   <-  mpcr_nor$CHRNA10
+m_nor_FA2H  <-  mpcr_nor$FA2H
+m_nor_SMYD1 <-  mpcr_nor$SMYD1
+m_nor_CLIC4 <-  mpcr_nor$CLIC4
+m_nor_COL4A1    <-  mpcr_nor$COL4A1
+m_nor_FAM189A1  <-  mpcr_nor$FAM189A1
+m_nor_PTGDR <-  mpcr_nor$PTGDR
+m_nor_SDCCAG8   <-  mpcr_nor$SDCCAG8
+m_nor_TF    <-  mpcr_nor$TF
+############################
+############################
+```
+
+```{r}
+hpcr_nor
+```
+
+
+
+```{r}
+#ALL PARAMETRIC UNDER LOG 10
+#shapiro.test	(	hpcr_nor$CERKL	)
+#shapiro.test	(	hpcr_nor$CHRNA10	)
+#shapiro.test	(	hpcr_nor$FA2H	)
+#shapiro.test	(	hpcr_nor$SMYD1	)
+#shapiro.test	(	hpcr_nor$CLIC4	)
+#shapiro.test	(	COL4A1_mcor_2	)# NON PARA
+#shapiro.test	(	hpcr_nor$FAM189A1	)
+#shapiro.test	(	hpcr_nor$PTGDR	)
+#shapiro.test	(	hpcr_nor$SDCCAG8	)
+#shapiro.test	(	hpcr_nor$TF	)
+#shapiro.test	(	mpcr_nor$CERKL	)
+#shapiro.test	(	CHRNA10_mcor_2)# Z-SCORE NORMALIZED fx_Z
+#shapiro.test	(	mpcr_nor$FA2H	)
+#shapiro.test	(	SMYD1_mcor_2	)# Z_SCORE NORMALIZED fx_Z
+#shapiro.test	(	mpcr_nor$CLIC4	)
+#shapiro.test	(	mpcr_nor$COL4A1	)
+#shapiro.test	(	mpcr_nor$FAM189A1	)
+#shapiro.test	(	mpcr_nor$PTGDR	)
+#shapiro.test	(	mpcr_nor$SDCCAG8	)
+#shapiro.test	(	mpcr_nor$TF	)
+```

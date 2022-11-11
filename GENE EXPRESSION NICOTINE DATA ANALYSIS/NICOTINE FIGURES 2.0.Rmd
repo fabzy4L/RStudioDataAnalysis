@@ -1,0 +1,305 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(dplyr)
+
+##### HIGH FAT DIET RAT  #47 SAMPLES, 4 SIG GENES
+hf_nor_2PCR
+##### HIGH FAT DIET RAT #23 SAMPLES
+high_fat
+##### NORMAL DIET RAT # 24 SAMPLES
+normal_diet
+#####HUMAN # 24 SAMPLES - ALL GENES
+hpcr_nor
+#####RAT #  48 SAMPLES - ALL GENES - HIGH FAT & NORMAL DIET - FOLD CHANGE NON NORM
+hf_2PCR
+```
+
+```{r}
+############################
+### AUTOMATIC
+fx_z <- function(gene) {
+  gene_std <- (gene - (mean(gene))/(sd(gene)))
+  return(gene_std)
+}
+############################
+####MANUAL INPUT
+fx_z2 <- function(gene,mean,sd) {
+  gene_std <- (gene - (mean)/(sd))
+  return(gene_std)
+}
+############################
+#mean(hf_2PCR$CERKL)
+#sd(hf_2PCR$CERKL)
+############################
+#mean(hf_2PCR$FA2H)
+#sd(hf_2PCR$FA2H)
+#############################
+shapiro.test(fx_z(hf_2PCR$CERKL))
+shapiro.test(fx_z(hf_2PCR$FA2H))
+
+```
+
+
+
+
+
+```{r}
+hf_2PCR
+NORMAL <- ALLRAT_2[1:24,]
+HIGH_FAT <- ALLRAT_2[24:47,]
+ALLRAT_2
+```
+
+
+```{r}
+ALLRAT_2
+```
+
+
+```{r}
+#hf_nor_2PCR = ALL RAT // NON NORMALIZED
+library(dplyr)
+ALLRAT <- select(hf_nor_2PCR, -SPECIES, -CHRNA10, -SMYD1)
+NUM <- ALLRAT[,4:5]
+AR_1 <- fx_z(NUM$CERKL)
+AR_2 <- fx_z(NUM$FA2H)
+LAB <- ALLRAT[,1:3]
+ALLRAT_2 <- data.frame(LAB,AR_1,AR_2)
+#hf_2PCR
+NORMALDIET <- ALLRAT_2[1:24,2:5]
+HF_DIET <- ALLRAT_2[25:47,2:5]
+shapiro.test(AR_2)
+shapiro.test(AR_1)
+names(ALLRAT_2)[4] <- 'CERKL'
+names(ALLRAT_2)[5] <- 'FA2H'
+names(NORMALDIET)[4] <- 'FA2H'
+names(NORMALDIET)[3] <- 'CERKL'
+names(HF_DIET)[4] <- 'FA2H'
+names(HF_DIET)[3] <- 'CERKL'
+```
+```{r}
+ALLRAT_2
+NORMALDIET
+HF_DIET
+```
+
+
+```{r}
+xx<- lm(ALLRAT_2$FA2H~ALLRAT_2$DX*ALLRAT_2$DIET)
+anova(xx)
+```
+
+
+```{r}
+shapiro.test(NORMALDIET$CERKL)
+shapiro.test(NORMALDIET$FA2H)
+shapiro.test(HF_DIET$CERKL)
+shapiro.test(HF_DIET$FA2H)
+```
+
+
+```{r}
+#library(heatmaply)
+#heatmaply(NORMALDIET, main="Rat - Normal Diet", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = #c(FALSE, FALSE), hide_colorbar=FALSE, dpi=600)
+#heatmaply(HF_DIET, main="Rat - High Fat Diet", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = #c(FALSE, FALSE), hide_colorbar=FALSE, dpi=600)
+```
+
+
+```{r}
+par(mfrow = c(2, 2))
+
+# HUMAN FA2H
+#interaction.plot(hpcr_nor$DX,hpcr_nor$SEX,hpcr_nor$FA2H, xlab="DX", ylab="FA2H", main="Human",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , #lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+#legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+# HUMAN CERKL
+#interaction.plot(hpcr_nor$DX,hpcr_nor$SEX,hpcr_nor$CERKL, xlab="DX",  ylab="CERKL", main="Human",  lty=c(1), ylim = c(-1.5,1.5),cex.axis = 0.8, legend=0 ,  col = c("pink", "blue"), #lwd=2.0, pch=c(1,1) ,xpd = F, trace.label = "SEX", dpi=300)
+#legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+# ALLRAT_2 DIET CERKL
+interaction.plot(ALLRAT_2$DX, ALLRAT_2$DIET, ALLRAT_2$CERKL, xlab="DX", ylab="CERKL", main="Rat - All Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 ,legend=0 , col = c("DARK GREEN", "blue") , xpd = F ,lwd=2.0, trace.label = "DIET", dpi=300)
+legend("topright", lwd=2.0, legend = c("HF","ND"), lty=c(1), col =  c("DARK  GREEN", "blue"))
+
+
+#lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "DIET", dpi=300)
+# ALLRAT_2 DIET FA2H
+interaction.plot(ALLRAT_2$DX, ALLRAT_2$DIET, ALLRAT_2$FA2H, xlab="DX", ylab="FA2H", main="Rat - All Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 ,col = c("DARK  GREEN", "blue") ,xpd = F , lwd=2.0, trace.label = "DIET", dpi=300)
+legend("topright", lwd=2.0, legend = c("HF","ND"), lty=c(1), col = c("DARK  GREEN", "blue"))
+
+##interaction.plot(ALLRAT_2$DX, ALLRAT_2$DIET, ALLRAT_2$FA2H, xlab="DX", ylab="FA2H", main="Rat - All Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , ##lwd=2.0,xpd = F , trace.label = "DIET", dpi=300)
+##legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+##interaction.plot(ALLRAT_2$DX, ALLRAT_2$DIET, ALLRAT_2$CERKL, xlab="DX", ylab="FA2H", main="Rat - All Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , ##lwd=2.0,xpd = F , trace.label = "DIET", dpi=300)
+#legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+
+```
+
+
+```{r}
+# HIGH FAT FA2H
+
+
+
+interaction.plot(high_fat$DX, high_fat$SEX, high_fat$FA2H, xlab="DX", ylab="FA2H", main="Rat - High Fat",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0, col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+# HIGH FAT CERKL
+interaction.plot(high_fat$DX, high_fat$SEX, high_fat$CERKL, xlab="DX", ylab="CERKL", main="Rat - High Fat",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0, col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+# HIGH FAT FA2H
+#interaction.plot(HF_DIET$DX, HF_DIET$SEX, HF_DIET$FA2H, xlab="DX", ylab="FA2H", main="Rat - High Fat",  l\ty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0, col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+#legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+# HIGH FAT CERKL
+#interaction.plot(HF_DIET$DX, HF_DIET$SEX, HF_DIET$CERKL, xlab="DX", ylab="CERKL", main="Rat - High Fat",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0, col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+```
+
+
+```{r}
+# NORMAL DIET CERKL
+interaction.plot(normal_diet$DX, normal_diet$SEX, normal_diet$CERKL, xlab="DX", ylab="CERKL", main="Rat - Normal Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+#interaction.plot(normal_diet_non$DX, normal_diet_non$SEX, normal_diet_non$CERKL, xlab="DX", ylab="CERKL", main="Rat - Normal Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = #0.8 , legend=0 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+#legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+
+# NORMAL DIET FA2H
+interaction.plot(normal_diet$DX, normal_diet$SEX, normal_diet$FA2H, xlab="DX", ylab="FA2H", main="Rat - Normal Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX",dpi=300)
+legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+# NORMAL DIET CERKL
+#interaction.plot(NORMALDIET$DX, NORMALDIET$SEX, NORMALDIET$CERKL, xlab="DX", ylab="CERKL", main="Rat - Normal Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+#legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+
+# NORMAL DIET FA2H
+#interaction.plot(NORMALDIET$DX, NORMALDIET$SEX, NORMALDIET$FA2H, xlab="DX", ylab="FA2H", main="Rat - Normal Diet",  lty=c(1), ylim = c(-1.5,1.5), cex.axis = 0.8 , legend=0 , col = c("pink", "blue") , lwd=2.0,xpd = F , trace.label = "SEX", dpi=300)
+#legend("topright", lwd=2.0, legend = c("F","M"), lty=c(1), col = c("pink", "blue"))
+       
+
+```
+
+```{r}
+#hf_nor_2PCR = ALL RAT // NON NORMALIZED
+library(dplyr)
+ALLRAT <- select(hf_nor_2PCR, -SPECIES, -CHRNA10, -SMYD1)
+NUM <- ALLRAT[,4:5]
+AR_1 <- fx_z(NUM$CERKL)
+AR_2 <- fx_z(NUM$FA2H)
+LAB <- ALLRAT[,1:3]
+ALLRAT_2 <- data.frame(LAB,AR_1,AR_2)
+#hf_2PCR
+
+shapiro.test(AR_2)
+
+#library(heatmaply)
+heatmaply(ALLRAT_2, main="Human", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=FALSE, dpi=600)
+
+```
+
+
+```{r}
+hf_2PCR_1 <-  select(hf_2PCR, -SPECIES, -X., -CHRNA10, -SMYD1)
+LAB <-hf_2PCR_1[,1:3]
+DAT<-hf_2PCR_1[,4:5]
+DAT2 <- fx(DAT)
+dietframe <- data.frame(LAB, DAT2)
+
+dietframe
+
+shapiro.test(dietframe$CERKL)
+shapiro.test(dietframe$FA2H)
+```
+
+
+```{r}
+heatmaply(ALLRAT, main="Human", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=TRUE, dpi=600)
+```
+
+
+```{r}
+#library(dplyr)
+#high_fat
+#shapiro.test(high_fat$CERKL)
+#shapiro.test(high_fat$FA2H)
+#hfat <- select(high_fat, -DIET, -CHRNA10, -SMYD1)
+#hfat <- select(high_fat, -SPECIES, -CHRNA10, -SMYD1)
+#hfat
+#NORMALDIET
+#heatmaply(HF_DIET, main="Rat - High Fat", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), hide_colorbar=TRUE, dpi=600)
+```
+
+
+```{r}
+
+
+normal_diet
+shapiro.test(normal_diet$CERKL)
+shapiro.test(normal_diet$FA2H)
+hfat <- select(high_fat, -DIET, -CHRNA10, -SMYD1)
+nfat<-select(normal_diet, -DIET, -CHRNA10, -SMYD1)
+             
+#hfat <- select(high_fat, -SPECIES, -CHRNA10, -SMYD1)
+#hfat
+#heatmaply(hfat, main="Rat - High Fat", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, #show_dendrogram = c(FALSE, FALSE), hide_colorbar=TRUE, dpi=600)
+#heatmaply(nfat, main="Rat - High Fat", xlab="Genes", ylab="Subjects", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, #show_dendrogram = c(FALSE, FALSE), hide_colorbar=TRUE, dpi=600)
+
+```
+
+
+```{r}
+NORMALDIET
+
+HF_DIET
+```
+
+```{r}
+hpcrnor
+```
+
+
+```{r}
+library(dplyr)
+library(heatmaply)
+hpcrnor <- select(hpcr_nor, -SPECIES, -CHRNA10, -SMYD1, -CLIC4, -COL4A1, -FAM189A1, -PTGDR, -SDCCAG8, -TF)
+hpcrnor
+#S:/SWBB/TTUHSC-Files/Outgoing Tissue_SWBB/Laura O-Dell-UTEP/Publication/FINAL FIGURES/NICOTINE FIGURES R STUDIO
+#"E:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/Human.pdf")
+```
+
+
+```{r}
+heatmaply(hpcrnor, main="Human",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=FALSE, dpi=300, file = "S:/SWBB/TTUHSC-Files/Outgoing Tissue_SWBB/Laura O-Dell-UTEP/Publication/FINAL FIGURES/NICOTINE FIGURES R STUDIO/Human.pdf")
+
+#heatmaply(hpcrnor, main="Human",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=TRUE, dpi=300, file = "S:/SWBB/TTUHSC-Files/Outgoing Tissue_SWBB/Laura O-Dell-UTEP/Publication/FINAL FIGURES/NICOTINE FIGURES R STUDIO/Human CB.pdf")
+```
+
+
+
+
+```{r}
+#D:/R STUDIO/    === /Volumes/F4L SWBB/
+webshot::install_phantomjs ()
+library(heatmaply)
+heatmaply(hfat, main="Rat - High Fat",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=FALSE, dpi=300, file = "D:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/Rat - High Fat.pdf")
+heatmaply(nfat, main="Rat - Normal Diet",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=FALSE, dpi=300, file = "D:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/Rat - Normal Diet.pdf")
+heatmaply(hfat, main="Rat - High Fat",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=TRUE, dpi=300, file = "D:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/Rat - High Fat 2.pdf")
+heatmaply(nfat, main="Rat - Normal Diet",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=TRUE, dpi=300, file = "D:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/Rat - Normal Diet 2.pdf")
+```
+
+
+```{r}
+heatmaply(nfat, main="Rat - Normal Diet",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=TRUE, dpi=300, file = "D:/R STUDIO/NICOTINE PAPER/CSV NICOTINE/Rat - Normal Diet 2.pdf")
+
+```
+
