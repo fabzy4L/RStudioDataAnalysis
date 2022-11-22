@@ -275,7 +275,8 @@ hpcrnor
 
 
 ```{r}
-#heatmaply(hpcrnor, main="Human",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=FALSE, dpi=300, file = "S:/SWBB/TTUHSC-Files/Outgoing Tissue_SWBB/Laura O-Dell-UTEP/Publication/FINAL FIGURES/NICOTINE FIGURES R STUDIO/Human.pdf")
+library(heatmaply)
+heatmaply(hpcrnor, main="Human",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=FALSE, dpi=300, file = "Human.pdf") #"SWBB/TTUHSC-Files/Outgoing Tissue_SWBB/Laura O-Dell-UTEP/Publication/FINAL FIGURES/NICOTINE FIGURES R STUDIO/Human.pdf")
 
 #heatmaply(hpcrnor, main="Human",  xlab="Genes", col=c("black","red"), row_side_palette= mfcol, labRow = NULL, show_dendrogram = c(FALSE, FALSE), showticklabels = c(T,F), hide_colorbar=TRUE, dpi=300, file = "S:/SWBB/TTUHSC-Files/Outgoing Tissue_SWBB/Laura O-Dell-UTEP/Publication/FINAL FIGURES/NICOTINE FIGURES R STUDIO/Human CB.pdf")
 ```
