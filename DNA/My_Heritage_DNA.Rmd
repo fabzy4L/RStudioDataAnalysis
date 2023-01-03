@@ -1,0 +1,21 @@
+---
+title: "My Heritage DNA - Fabian Alvarez-Primo, PhD"
+output: html_notebook
+---
+
+```{r}
+
+dna<-read.csv('/Users/f4L/Library/Containers/com.microsoft.Excel/Data/Downloads/DNA/FAP_RAW_DNA.csv')
+
+RSID <- dna$RSID
+
+CHROMOSOME <- dna$CHROMOSOME
+
+POSITION <- dna$POSITION
+
+RESULT <- dna$RESULT
+
+dna
+
+
+```
