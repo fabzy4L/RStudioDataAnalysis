@@ -1,0 +1,187 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+framingham
+```
+
+```{r}
+# 2. WHAT IS THE PREVALENCE OF CHD 
+prevchd <- framingham$prevchd
+#prevchd
+CHD <- sum(prevchd)
+CHD
+CHD/4434*100
+# 4.37% PREVALENCE
+```
+
+
+```{r}
+# 3. ASSOC. BTWN HTN & INCIDENCE OF DEATH 24 YEARS LATER
+prevhyp <- framingham$prevhyp
+#sum(prevhyp)
+
+TOTAL = 4434
+HTN = 1430
+NON_HTN = 4434 - 1430
+DEAD = 1550
+ALIVE = TOTAL - DEAD
+DEAD_HTN <- 758
+ALIVE_HTN <- 672
+ALIVE_NON <- 2212
+DEAD_HTN <- 758
+DEAD_NON <- 792
+######
+HTN
+NON_HTN
+ALIVE
+DEAD
+TOTAL
+```
+```{r}
+#Incidence is 
+#2x2 plot, DEAD & ALIVE VS NO HTN & HTN
+# risk ratio = # of people alive w/ hypertension / # of people alive w/o hypertension
+
+test <- matrix(c(672,2212,758,792), nrow = 2, dimnames = list('Dx'=c('Hypertension',"Non-Case"), 'Status'=c('Alive','Dead')))
+test
+
+```
+
+
+```{r}
+#probability hypertension
+phtn <- 1430/4434
+#probability Alive
+pal <- 2884/4434
+#hypertension + alive = phtn*pal
+phtn*pal
+prob <- phtn*pal
+#EXPECTED ALIVE W/ HTN
+EX_L_HTN <- TOTAL*prob
+EX_L_HTN
+```
+
+
+```{r}
+chisq.test(test)$observed
+```
+
+
+```{r}
+chisq.test(test)$expected
+```
+
+
+```{r}
+chisq.test(test)
+```
+
+
+```{r}
+
+# ODDS RATIO 
+
+#a = Number of dead htn
+#b = Number of dead non-cases
+#c = Number of alive htn
+#d = Number of alive non-cases
+#OR=a*d/b*c
+
+
+(DEAD_HTN*ALIVE_NON)/(ALIVE_HTN*DEAD_NON)
+
+```
+
+
+```{r}
+test
+#FISHER TEST DOES NOT APPLY HERE (?)
+fisher.test(test)
+#ODDS RATIO = 0.3175
+```
+
+```{r}
+#RATE RATIO
+#NON/ALIVE VS ILL/ALIVE OVER 24 YEARS
+
+ALIVE <- 672+2212
+DEAD <- 758+792
+alive_htn <- 672
+alive_non <- 2212
+dead_htn <- 758
+dead_non <- 792
+
+FREQ_1 = alive_htn/ALIVE
+FREQ_2 = alive_non/ALIVE
+FREQ_T <- (FREQ_1)/(FREQ_2)
+FREQ_T
+```
+
+```{r}
+#INCIDENCE PROPORTION OF PEOPLE W/ HTN OVER A 24Y F/U
+# 100* DEAD W/ HYPERTENSION
+100*(dead_htn/DEAD)
+
+```
+```{r}
+mosaicplot(t(test), col=c('purple','blue'), main= 'DX V. STATUS PLOT')
+
+```
+
+```{r}
+# INCIDENCE =  ANYCHD/HTN
+
+ANYCHD/HTN*100
+```
+
+
+```{r}
+test_2 <- matrix(c(562,678,868, 2326), nrow = 2, dimnames = list('Dx'=c('Hypertension',"Non-Case"), 'Status'=c('CHD','NON CHD')))
+test_2
+```
+
+
+```{r}
+
+#rate ratio = chd/htn / non/htn
+
+# INCIDENCE = # cases of disease/ population w/o disease at baseline
+#sum(framingham$anychd)
+
+#ANYCHD <- 1240
+#NONCHD <- 868 + 2326
+##ALIVE_HTN
+#HTN_CHD <- 562
+#HTN_NONCHD <- 868
+#CHD_NONHTN <- 678
+#NONCHD_NONHTN <- 2326
+
+############
+#NONCHD
+#ANYCHD
+#HTN
+#NON_HTN
+
+
+FREQ_3 = ANYCHD/HTN
+FREQ_4 = NONCHD/HTN
+FREQ_T2 <- (FREQ_3)/(FREQ_4)
+FREQ_T2*100
+
+
+```
+
+
+```{r}
+chisq.test(test_2)$observed
+
+chisq.test(test_2)$expected
+chisq.test(test_2)
+```
