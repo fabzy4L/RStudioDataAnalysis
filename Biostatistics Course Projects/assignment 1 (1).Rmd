@@ -1,0 +1,83 @@
+---
+title: "Class Data"
+output:
+  html_document:
+    df_print: paged
+---
+```{r}
+#mean
+mean(Height.cm)
+
+#median
+median(Height.cm)
+
+#standard deviation
+sd(Height.cm)
+
+#standard error
+se <- function(x) sd(x)/sqrt(length(x))
+x = Height.cm
+se(x)
+
+#minimum
+min(Height.cm)
+
+#maximum
+max(Height.cm)
+
+#25th, 50th, 75th, 97.5th percentile
+quantile(Height.cm, probs = c(0.25, 0.50, 0.75, 0.975))
+```
+```{r}
+
+#confidence interval
+
+n <-with(Class.data, length(ID))
+m <-mean(Height.cm)
+s <-sd(Height.cm)
+
+# Z- value for 95%
+z = 1.960
+
+#Error
+error <- z*(s/(sqrt(n)))
+error
+
+#Confidence interval range lower end
+m - error
+#Confidence interval range upper end
+m + error
+
+
+```
+```{r}
+#histogram
+hist(Height.cm)
+
+```
+```{r}
+
+#e. Mean Heights per sex
+tapply(Height.cm, Sex, mean)
+
+```
+```{r}
+
+#f. right handed
+table(Handedness)
+
+```
+```{r}
+#g. Sex vs Height average
+y2 <-with(Class.data, tapply(Height.cm, Sex, mean))
+barplot(y2)
+
+```
+```{r}
+
+#h. height and head circumference
+plot(CircumferenceHead.com,Height.cm)
+abline(lm(Height.cm~CircumferenceHead.com))
+
+```
+```{r}

@@ -1,0 +1,226 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+#1. SOCKS - 25% Black & 75% White.
+# a. what is the probability of 8 black socks in a 12 sock sample.
+# Chance = 0.0028 -OR- 0.28%. Chence of grabbing 8 black socks exactly (4 pairs) from a 12 sock sample is exactly 0.28%.
+binom.test(8,12,0.25)
+#Alternatively - 0.24% chance predicted by dbinom
+dbinom(8,12,0.25)
+
+```
+```{r}
+#b. Probability of grabbing 8 or more black individual socks (4 pairs or more), from an 18 sock random sample.
+# Chance = 0.05695 -OR- 5.69%. Chance of grabbing 4 or more pairs from an 18 sock random sample is 5.69%.
+binom.test(8,18,0.25, alternative = c("greater"))
+```
+```{r}
+#c. How many socks do I need to pick to make sure I at least grab 6 black socks (3 pairs) from a 30 random sample, with a Chance of 50% success? - Between 18 and 19 socks must be grabbed for a 41 - 59% chance of succesfully grabbing 3 pairs.
+binom.test(6,19,0.25)
+```
+```{r}
+#2. Mosaic plot between gummy worms eaten.
+gummy.worms.2 <- matrix(c(32,14,12,22,44,36), nrow=c(2,3), dimnames=list("Fate"=c("Eaten", "Not Eaten"), "Color"=c("Green", "Orange", "Total")))
+
+gummy.worms.2
+
+mosaicplot(t(gummy.worms.2), color=c("blue","black"), main = 'Gummy Worm Mosaic Plot')
+```
+
+
+```{r}
+#3. power analysis to check for sample size to be able to confirm that effect sizes were detectable with a power of at least 0.80 (P < 0.05) and effect size of a variable was 8, and standard deviation was 5. 
+# n = 7.23 samples - Amount of samples required to achieve significance in test and this level of precision.
+power.t.test(delta=8, sd=5, sig.level = 0.05, power = 0.8 )
+```
+
+
+```{r}
+#4. Was there an effect to changing dietary regimen from HIGH FAT-HIGH SALT to DIET?
+SBP.exam
+```
+
+
+```{r}
+shapiro.test(SBP.exam$SBP.before)
+shapiro.test(SBP.exam$SBP.after)
+```
+
+
+```{r}
+plot(SBP.exam$Individual, SBP.exam$SBP.before, type = 'n', ylab = c("SBP"), xlab= c("Individuals"), ylim = c(100,145))
+
+points(SBP.exam$Individual, SBP.exam$SBP.before, col='red')
+points(SBP.exam$Individual, SBP.exam$SBP.after)
+legend("topright", c("Before","After"),pch=1,col=c("red","black"), cex=0.7)
+
+#interaction.plot(SBP.exam2$Individual,SBP.exam2$group,SBP.exam2$bp, ylab = 'SBP', xlab = 'Individual', legend=0)
+#legend("topright", c("After Diet","Before Diet"),lty=c(2,1),col=c("black"), cex=0.7)
+```
+
+
+```{r}
+anova(lm(SBP.exam2$bp~SBP.exam2$group*SBP.exam2$Individual))
+TukeyHSD(aov(SBP.exam2$bp~SBP.exam2$group))
+```
+```{r}
+#5. Effects of different sleep aids for REM Stages
+Comparison.exam
+```
+```{r}
+# Normality
+shapiro.test(Comparison.exam$Time)
+```
+
+```{r}
+anova(lm(Comparison.exam$Time~Comparison.exam$Drug))
+TukeyHSD(aov(Comparison.exam$Time~Comparison.exam$Drug))
+```
+```{r}
+# Plotbox graph, comparing times until REM. Upon ANOVA and TUKEY TEST ANALYSIS, it was made evident that no group had a particular advantage in comparise to the rest, in terms of accelerating sleep descent into REM.
+
+# Group A - showed no statistically significant reduction in 'Time until REM' than any of the groups aside from Group D (p<0.05).
+# Group B - similarly, had no significantly different effect whatsoever to any of the other groups.
+# Group C - differed most (p<0.05) from Group D (slowest acting drug v. other groups), but not the rest of the groups.
+# Group D and E - showed no statistically significant difference whatsoever to any of the other groups (maybe to due to a wide range of results), though was close to approximating the rejection of the null hypothesis among each other (E V. D @ p=0.09 v. p<0.05).
+
+plot(Comparison.exam$Time~Comparison.exam$Drug, xlab='Drug', ylab='Time until REM',ylim=c(0,110))
+text(1,105, "A")
+text(2,105, "A/B")
+text(3,105, "A")
+text(4,105, "A/B")
+text(5,105, "A")
+```
+
+
+```{r}
+#All assumptions of normality and normal residuals are met. 
+par(mfrow=c(2,2))
+plot(lm(Comparison.exam$Time~Comparison.exam$Drug))
+```
+
+
+```{r}
+#6. Tanker truck
+gw.wells
+```
+```{r}
+#6A. Create a formula to predict concentration of oil at a fiven distance. 
+# Tested both quadratic and cubic formulas as well to compare fit vs the linear regression model and noticed no actual improvement whatsoever when in comparison. Additionally, quadratic formula did not show any particular statistical significance when comparing the quadratic component to the linear one: I(gw.wells$Distance.m^2) -- P = 0.833.
+
+Oil.quad = lm(formula = gw.wells$Oil.concentration ~ gw.wells$Distance.m +  I(gw.wells$Distance.m^2))
+summary(Oil.quad)
+summary(lm(gw.wells$Oil.concentration~gw.wells$Distance.m))
+```
+
+
+```{r}
+#6B. Data are normal - Meets linearity assumption - Residuals are normal - All LM ASSUMPTIONS ARE MET
+shapiro.test(gw.wells$Oil.concentration)
+shapiro.test(gw.wells$Distance.m)
+par(mfrow=c(2,2))
+plot(lm(gw.wells$Oil.concentration~gw.wells$Distance.m))
+```
+
+```{r}
+#6C. R^2 for Linear Regression Model = 0.9842 (p-value: 2.938e-11) vs Quadratic = 0.9843 (p-value: 9.644e-10). Chose to go with LM model due simplicity and higher stat significance.
+
+plot(gw.wells$Oil.concentration~gw.wells$Distance.m, ylab = "Oil Concentration", xlab="Distance (m)")
+abline(lm(gw.wells$Oil.concentration~gw.wells$Distance.m), col='red')
+text(125,170,"Predicted concentration with formula:",cex=0.75)
+text(125,140,"Oil Concentration = 549.9 - 1.5*Distance",cex=0.75, col='red')
+text(255,195,"174.9",cex = 0.8)
+points(250,174.9,pch=1, col='red',lwd=2.5)
+arrows(240,170,200,170, length= 0.1, angle = 45, code= 1 )
+```
+
+
+```{r}
+# Oil concentration =     549.9 - 1.5*Distance
+Distance <- 250
+Oil.concentration =     549.9 - 1.5*Distance
+# Oil concentration @ x = 250 meters is approximately 174.9
+Oil.concentration
+```
+```{r}
+#7. effectiveness of 5 different sleep aids in their effectiveness in increasing the rate at which subjects reached REM sleep. To account for any differences among test sites, they used 5 different sleep clinics in a block design. 
+RCB.exam
+```
+
+
+```{r}
+#BOX PLOTS FOR COMPARISON
+par(mfrow=c(1,2))
+boxplot(RCB.exam$Time~RCB.exam$Drug, ylab="Time until REM", xlab="Drug")
+boxplot(RCB.exam$Time~RCB.exam$Clinic, ylab="Time until REM", xlab="Clinic")
+```
+```{r}
+#Interaction PLOT (NOT PARTICULARLY SUITABLE FOR THIS SINCE IT IS NOT CONTINUOUS DATA, HOWEVER IT IS USEFUL FOR VISUALIZATION OF RCB). Clinic 5 had overall smaller Time until REM vs group 3 and 1, however not otherwise. Drugs did not present evidence of difference in Time until REM among each other. 
+
+
+clinic.dbl <- as.double(RCB.exam$Clinic)
+drug.dbl <- as.double(RCB.exam$Drug)
+time.dbl <- as.double(RCB.exam$Time)
+interaction.plot(clinic.dbl,drug.dbl,time.dbl, ylab="Time until REM",xlab="Clinic",lty = (1:4), legend=0)
+legend("topright", c("A","B","C","D"),col=c("black"),lty=(1:4), cex=0.7)
+```
+
+
+```{r}
+#7A. BLOCK ANOVA 
+clinic.factor <- factor(RCB.exam$Clinic)
+shapiro.test(RCB.exam$Time)
+anova(lm(RCB.exam$Time~clinic.factor+RCB.exam$Drug))
+
+#ANOVA & TUKEY INTERPRETATION: There was no significant difference among the drugs used in this trial, however the clinic had statistically significant influence (p<0.05) in determining its the rate at which sleeping aid medication helps achieve REM. Clinic 5 showed evidence of significant influence (p<0.05) on "Time until REM" vs. Clinic 1 and Clinic 3 (producing 'quicker acting sleep aid drugs'), however there was no evidence of any significance in comparison to other groups and from other groups among others. 
+
+TukeyHSD(aov(RCB.exam$Time~clinic.factor+RCB.exam$Drug))
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+#8.	Microbes in the soil can have different preferences 
+pca.exam4
+```
+
+
+```{r}
+pca.sl.st <- scale(pca.exam4)
+summary(pca.sl.st)
+pca.ex.1 <- princomp(pca.sl.st, cor=TRUE)
+```
+
+
+```{r}
+#Axis 1 & 2 account for 19% and 10% of the variation of the data, respectively.
+summary(pca.ex.1)
+```
+```{r}
+#BI PLOT OF PCA
+biplot(pca.ex.1,  ylab="Axis 2", xlab="Axis 1")
+```
+
+
+```{r}
+cor(pca.exam4, pca.ex.1$scores[,1:2])
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
