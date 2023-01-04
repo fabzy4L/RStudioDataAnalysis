@@ -4,7 +4,6 @@ output: html_notebook
 ---
 
 ```{r}
-
 dna<-read.csv('/Users/f4L/Library/Containers/com.microsoft.Excel/Data/Downloads/DNA/FAP_RAW_DNA.csv')
 
 RSID <- dna$RSID
@@ -16,6 +15,29 @@ POSITION <- dna$POSITION
 RESULT <- dna$RESULT
 
 dna
+
+#HOW CAN I FIND RSID IN NCBI
+```
+
+
+```{r}
+#library(BiocManager)
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("biomaRt")
+```
+
+
+```{r}
+
+```
+
+#https://uswest.ensembl.org/info/data/biomart/biomart_r_package.html
+
+#https://support.bioconductor.org/p/9135301/
+
+#snp_mart <- biomaRt::useMart(biomart="ENSEMBL_MART_SNP", host="grch37.ensembl.org", path="/biomart/martservice", dataset="hsapiens_snp")
 
 
 ```
