@@ -10,14 +10,27 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
+library(car)
+sfdf <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/Biostatistics Course Projects/SantaFe.csv')
 scatterplot(Monthly.discharge.m3.S~Monthly.precip.mm, regLine=TRUE, 
   smooth=FALSE, boxplots=FALSE, xlab="Precipitation", ylab="Discharge", 
-  data=SantaFe)
+  data=sfdf)
 ```
 
 
 ```{r}
-AggregatedData<- aggregate(cbind(Monthly.discharge.m3.S, SnowRain) ~ Year, data=SantaFe, FUN=mean)
+sfdf
+```
+
+
+```{r}
+colnames(sfdf)
+```
+
+
+```{r}
+SnowRain <- sfdf$Monthly.precip.mm + sfdf$Monthly.SWE.mm
+AggregatedData<- aggregate(cbind(Monthly.discharge.m3.S, SnowRain) ~ Year, data=sfdf, FUN=mean)
 scatterplot(Monthly.discharge.m3.S~SnowRain, regLine=TRUE, smooth=FALSE, 
   boxplots=FALSE, data=AggregatedData)
 ```
@@ -25,16 +38,21 @@ scatterplot(Monthly.discharge.m3.S~SnowRain, regLine=TRUE, smooth=FALSE,
 
 ```{r}
 MeanAnnualTemp<- aggregate(cbind(Monthly.mean.temp.C, Year.2) ~ Year, 
-  data=SantaFe, FUN=mean)
+  data=sfdf, FUN=mean)
 scatterplot(Monthly.mean.temp.C~Year.2, regLine=TRUE, smooth=FALSE, 
   boxplots=FALSE, data=MeanAnnualTemp)
 ```
 
 
 ```{r}
+#library(rcmdr)
+#library(car)
+```
 
-numSummary(MeanAnnualTemp[,"Monthly.mean.temp.C", drop=FALSE], 
-  groups=MeanAnnualTemp$Year, statistics=c("mean", "sd", "IQR", "quantiles"), 
+
+```{r}
+numSummary(sfdf[,"Monthly.mean.temp.C", drop=FALSE], 
+  groups=sfdf$Year, statistics=c("mean", "sd", "IQR", "quantiles"), 
   quantiles=c(0,.25,.5,.75,1))
 
 ```
