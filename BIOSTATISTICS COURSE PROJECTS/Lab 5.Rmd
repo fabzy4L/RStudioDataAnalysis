@@ -1,0 +1,118 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+#1. Daphnia
+daphnia <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/daphnia.csv')
+cyandensity <- daphnia$cyandensity
+resistance <- daphnia$resistance
+  
+
+#1. Shapiro Test for normality. If p < 0.05 = reject hypothesis (i.e Data are NOT normal). P > 0.05, DATA are normal.
+shapiro.test(resistance)
+
+```
+```{r}
+#1. Histogram for normality
+hist(resistance)
+```
+```{r}
+#1. QQ plot for normality
+qqnorm(resistance)
+
+```
+```{r}
+#1. 1-way ANOVA Test P < 0.05, We REJECT the H0 = The mean resistances are different in AT LEAST one of the Cyandensity groups.
+summary(aov(daphnia$resistance~daphnia$cyandensity))
+
+```
+```{r}
+#1. BOXPLOT for Cyandensity vs Resistance
+boxplot(daphnia$resistance~daphnia$cyandensity, main="Cyandensity v. Resistance", ylab="Resistance", xlab="Cyandensity", ylim=c(0,1))
+text(1, 1, "A")
+text(2, 1, "B")
+text(3, 1, "A")
+```
+```{r}
+#1. Tukey HSD test 
+
+#low-high REJECTS H0
+#med-high DOES NOT REJECT
+#med-low REJECTS H0
+
+#THERE IS N.S. in resistance between MED-HIGH, but there is a statistical difference between LOW and the rest of the groups.
+
+tukey <- TukeyHSD(aov(daphnia$resistance~daphnia$cyandensity))
+tukey
+
+```
+```{r}
+plot(tukey)
+```
+```{r}
+#2. Circadian Mutant Health
+circadian.mutant.health <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/circadian mutant health.csv')
+
+Genotype <- circadian.mutant.health$Genotype
+Time.to.death..days. <- circadian.mutant.health$Time.to.death..days.
+
+#2. Histogram for normality. DATA ARE NOT NORMAL
+hist(Time.to.death..days.)
+```
+
+```{r}
+#2. qq plot for normality. DATA ARE NOT NORMAL
+qqnorm(Time.to.death..days.)
+```
+```{r}
+#2. Shapiro Wilk Test for normality. If p < 0.05 = reject hypothesis (i.e Data are NOT normal). P < 0.05, DATA ARE NOT NORMAL. DOES NOT MEET CRITERIA FOR ANOVA.
+# P is too small. CAN'T BE NORMALIZED
+shapiro.test((Time.to.death..days.))
+```
+```{r}
+#2. NON-PARAMETRIC TEST for non Normalized data. P < 0.05, We REJECT the H0. There is a difference between mean Time of death rays in AT LEAST one of the Genotypes. Circadian rhythm does influence the disease in at least one of the groups.
+kruskal.test(Time.to.death..days.~Genotype)
+```
+```{r}
+#THERE IS NO DIFFERENCE BETWEEN tim01.res & wild type genotype, however, tim01 is significantly different to the other groups.
+library(pgirmess)
+kruskalmc(Time.to.death..days.~Genotype)
+
+
+```
+
+```{r}
+boxplot(Time.to.death..days.~Genotype, main="Genotype v. Time to Death", ylab="Time (days)", xlab="Genotype", ylim=c(0,25))
+text(1, 25, "B")
+text(2, 25, "A")
+text(3, 25, "A")
+```
+```{r}
+#3.  Protein
+protein.fitness <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/protein.fitness.csv')
+Gender<-protein.fitness$Gender
+Protein.in.diet<- protein.fitness$Protein.in.diet
+Fitness.score <- protein.fitness$Fitness.score
+
+#3. Shapiro test for normality
+par(mfrow=c(2,2))
+hist(Fitness.score)
+qqnorm(Fitness.score)
+```
+
+
+```{r}
+shapiro.test(Fitness.score) #"Data is normal"
+```
+```{r}
+#3. 2 - WAY ANOVA & F - TEST.
+# H0.1 -REJECT H0 - Gender DOES have an effect on fitness
+# H0.2 - REJECT H0 - Protein DOES have an effect on fitness
+# H0.3 - DO NOT REJECT H0 - There is NO INTERACTION between Protein and Gender
+anova(lm(Fitness.score~Gender*Protein.in.diet))
+```
+```{r}
+interaction.plot(Gender,Protein.in.diet, Fitness.score, ylab="Fitness Score", main="Protein Intake, Gender & Fitness Score")
+```

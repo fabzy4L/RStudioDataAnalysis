@@ -1,0 +1,91 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+telomere.inheritance <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/telomere inheritance.csv')
+father.telomere.length<-telomere.inheritance$father.telomere.length
+offspring.telomere.length<-telomere.inheritance$offspring.telomere.length
+
+```
+
+
+```{r}
+y <- offspring.telomere.length
+x <- father.telomere.length
+```
+
+```{r}
+
+#1A. Scatterplot of data appears to follow a trend in correlation
+
+sc1 <- scatter.smooth(telomere.inheritance, main= "Relationship of Parent and Offspring Telomere length", xlab= "Paternal Telomere Length", ylab = "Offspring Telomere Length")
+
+```
+
+```{r}
+#1B. Histogram of data appears to be normal
+par(mfrow=c(2,2))
+hist(father.telomere.length, main= "Parent Telomere Length", xlab= "Telomere Length")
+hist(offspring.telomere.length, main= "Offspring Telomere Length", xlab= "Telomere Length")
+
+```
+
+```{r}
+#1B. Both groups from data set meet the criteria of Shapiro Wilk test, the data in fact are normal and P > 0.05
+# The assumption that X & Y are normally distributed is met.
+#1B. The data do not violate the assumption of homoscedasticity.
+#1B. There is a linear relationship between X & Y.
+shapiro.test(father.telomere.length)
+shapiro.test(offspring.telomere.length)
+```
+```{r}
+#1C. Correlation test shows a correlation between father and offspring telomere length. There is statistical evidence of a moderate correlation, where r = 0.58.
+cor.test(offspring.telomere.length,father.telomere.length)
+```
+```{r}
+#1D. Equation of prediction through linear regression model. 
+# for y = a+bx, y = 0.2252 + 0.9792*x
+
+eq <- lm(offspring.telomere.length~father.telomere.length)
+eq
+
+```
+```{r}
+
+#1D. R^2 = 0.3353, p < 0.0001, indicating a very high statistical significance.
+summary(eq)
+
+```
+```{r}
+
+#1E. The assumptions of the Linear Regression model are met
+#1E. Y is a linear funciton of X
+#1E. Y Variance is relatively homogeneneous along any given X value.
+
+par(mfrow=c(2,2))
+plot(eq)
+abline(eq)
+
+```
+```{r}
+
+#1F. 34% of the Offspring Telomere length are predicted from the Father Telomere Length
+
+plot(telomere.inheritance, main= "Relationship of Parent and Offspring Telomere length", xlab= "Paternal Telomere Length", ylab = "Offspring Telomere Length")
+abline(lm(offspring.telomere.length~father.telomere.length))
+text(0.82,0.35, "y = 0.2252 + 0.9792*x, [r2 = 0.3353, p < 0.0001]")
+
+```
+```{r}
+
+#1G. y = 0.2252 + 0.9792*x, if Father Telomere Length was 1 unit longer, then Offspring Telomere Length will increase by 0.9792*(1)
+y1 = 0.2252 + 0.9792*1
+y1
+#1G. y = 0.2252 + 0.9792*x, if Father Telomere Length was 0.1 unit longer, then Offspring Telomere Length will increase by 2 + 0.9792*(0.1) 
+y2 = 0.2252 + 0.9792*0.1
+y2
+```
+
+

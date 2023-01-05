@@ -1,0 +1,157 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+TreeData <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/TreeData.csv')
+Site<-TreeData$Site
+Biomass<-TreeData$Biomass
+ABPR<-TreeData$ABPR
+StandAge<-TreeData$StandAge
+x<-TreeData$x
+y<-TreeData$y
+elev<-TreeData$elev
+Northeastness<-TreeData$Northeastness
+Slope<-TreeData$Slope
+SlopePos<-TreeData$SlopePos
+
+ABPR2<-as.factor(ABPR)
+# Biomass is correlated to STAND AGE, X, Y, ELEV AND NORTHEASTNESS
+# STRONGEST correlations to Biomass  are Y, ELEV, SLOPE  (BIOMASS,Y = 0.51121715// BIOMASS,ELEV= 0.63768070 // BIOMASS, SLOPE is negative =  -0.59534039)
+# STRONGEST correlations to Y  (besides BIOMASS) is ELEV (Y, ELEV = 0.56770786)
+# Y and ELEV are comfortable variables to represent the model with. y and elev are also correlated among themselves strongly. 
+#Weakest to strongest correlation in order: x < stand age < northeastness < y < elev
+
+alt.cor <- cor(TreeData[,c(2:9)])
+alt.cor
+```
+```{r}
+bm.1 <- lm(TreeData$Biomass~ TreeData$ABPR + TreeData$StandAge + TreeData$x + TreeData$y + TreeData$elev + TreeData$Northeastness + TreeData$Slope)
+
+# P < 2.2x10^-16, adj.R^2 =  0.8355  // strong correlation, highly statistically significant relationship 
+#Biomass =   -7605.0 - 27.49ABPR + 0.2210StandAge + 0.006811X + 0.001504Y + 0.4000Elev + 0.8785NE - 10.29Slope  
+summary(bm.1) 
+```
+
+```{r}
+#    SA =    1.706408     1.047651     1.146206     1.765445    2.331736     1.111209   1.136258 
+vif(bm.1)
+```
+```{r}
+par(mfrow=c(2,2))
+plot(bm.1)
+```
+
+
+```{r}
+#Model results in:
+# TreeData$Biomass ~ TreeData$ABPR + TreeData$StandAge +  TreeData$y + TreeData$elev + TreeData$Northeastness + TreeData$Slope
+# Adjusted R-squared:  0.8368 , p-value: < 2.2e-16
+bm.2 <- update(bm.1, .~.-TreeData$x)
+summary(bm.2)
+# TreeData$Biomass ~ TreeData$ABPR + TreeData$StandAge + TreeData$elev + TreeData$Northeastness + TreeData$Slope)
+# Adjusted R-squared:  0.8356 , p-value: < 2.2e-16
+bm.3 <- update(bm.2, .~.-TreeData$y)
+summary(bm.3)
+```
+
+```{r}
+#Corroboration of model through stepwise regression.
+step(bm.1, direction="backward", keep = NULL)
+
+```
+```{r}
+##Biomass =    127.1563 - -31.8249ABPR +  0.2219StandAge +  0.4304Elev +  87.1483NE - 10.5168Slope  
+#bm.2 = model predicted by stepwise regression// test for residuals.
+# The variable that represents the data most strongly is ELEVATION. IT presents the highes correlation and statistical significance, upon inspection. 
+bm.sw <- lm(TreeData$Biomass ~ TreeData$ABPR + TreeData$StandAge +  TreeData$elev + TreeData$Northeastness + TreeData$Slope)
+shapiro.test((resid(bm.sw)))
+```
+```{r}
+GATOR <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/GATOR.csv')
+sex<-GATOR$sex
+snout.vent<-GATOR$snout.vent
+pelvic.width<-GATOR$pelvic.width
+
+m.gator <- GATOR[1:19, 1:3]
+f.gator <- GATOR[20:35, 1:3]
+#Data are normal.
+shapiro.test(m.gator$pelvic.width)
+shapiro.test(m.gator$snout.vent)
+shapiro.test(f.gator$snout.vent)
+shapiro.test(f.gator$pelvic.width)
+```
+
+
+```{r}
+plot(pelvic.width~snout.vent, type='n', xlab = "Snout Vent (m)", ylab = "Pelvic Canal Width (cm)")
+points(m.gator$snout.vent, m.gator$pelvic.width, pch=20, col="blue")
+points(f.gator$snout.vent, f.gator$pelvic.width, pch=5, col="pink")
+abline(lm(m.gator$pelvic.width~m.gator$snout.vent), col=c("blue"))
+abline(lm(f.gator$pelvic.width~f.gator$snout.vent), col=c("pink"))
+legend("topleft", c("Male", "Female"), lty=c(1,2), pch=c(20,5),
+col=c("Blue", "Pink"), cex=0.7)
+```
+
+
+```{r}
+# MALE: p-value: 6.846e-07, Multiple R-squared:  0.7742, Adjusted R-squared:  0.761. HIGHLY SIGNIFICANT AND STRONG RELATIONSHIP PRESENT.
+# MALE = 0.4527 + 6.5854*SNOUT.VENT
+summary(lm(m.gator$pelvic.width~m.gator$snout.vent))
+
+# FEMALE :  p-value: 5.797e-06, Multiple R-squared:  0.7801, Adjusted R-squared:  0.7644. HIGHLY SIGNIFICANT AND STRONG RELATIONSHIP PRESENT.
+# FEMALE =  -0.2199 + 6.7471*SNOUT.VENT
+summary(lm(f.gator$pelvic.width~f.gator$snout.vent))
+
+```
+```{r}
+#
+anova(lm(GATOR$snout.vent~GATOR$sex))
+TukeyHSD(aov(GATOR$snout.vent~GATOR$sex))
+```
+
+```{r}
+## INTERACTION IN BOTH CASES IS HIGHLY SIGNIFICANT: THE SNOUT VENT IS SIGNIFICANTLY RELATED TO 
+#MALE GATOR ANOVA
+anova(lm(m.gator$pelvic.width~m.gator$snout.vent))
+plot
+#FEMALE GATOR ANOVA
+anova(lm(f.gator$pelvic.width~f.gator$snout.vent))
+
+```
+
+
+```{r}
+lmpw <- 1/(m.gator$pelvic.width)
+lmsv <- 1/(m.gator$snout.vent)
+#FEMALE DATA CAN NOT BE TRANSFORMED. 
+lfpw <- log10(f.gator$pelvic.width+1)
+lfsv <- log10(f.gator$snout.vent+1)
+lm.mps <- lm(lmpw~lmsv)
+lm.fps <- lm(lfpw~lfsv)
+#MALE - NORMAL// FEMALE - NOT NORMAL. 
+shapiro.test(resid(lm.mps))
+shapiro.test(resid(lm.fps))
+```
+```{r}
+#FEMALE DATA DOES NOT FIT THE SRL
+par(mfrow=c(2,2))
+plot(lm.mps)
+plot(lm.fps)
+```
+
+
+```{r}
+# SNOUT.VENT:SEX INTERACTION IS NOT STATISTICALLY SIGNIFICANT/RELEVANT IN DETERMINING PELVIC WIDTH
+summary(aov(pelvic.width~snout.vent*sex))
+# SEX HAS A MODERATE SIGNIFICANT EFFECT ON PELVIC WIDTH, AND SNOUT VENT HAS A VERY HIGHLY SIGNIFICANT EFFECT ON PELVIC WIDTH, HOWEVER THEY DONT HAVE A SIGNIFICANT INTERACTION AMONG EACH OTHER. WE CAN ASSUME THE SLOPES ARE EQUAL. 
+summary(aov(pelvic.width~snout.vent+sex))
+```
+```{r}
+#Removing the interaction of sex among values does not affect the model. P = 0.9101. NO SEX DETERMINATION IS REQUIRED FOR PELVIC CANAL WEIGHT VS. SNOUT VENT.
+interaction.1 <- (aov(pelvic.width~snout.vent*sex))
+no.interaction.1 <- (aov(pelvic.width~snout.vent+sex))
+anova(interaction.1,no.interaction.1)
+```
+
