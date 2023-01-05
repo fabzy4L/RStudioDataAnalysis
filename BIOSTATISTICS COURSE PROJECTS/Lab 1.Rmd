@@ -5,6 +5,23 @@ output:
     df_print: paged
 ---
 ```{r}
+cddf <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/Class-data.csv')
+
+ID <- cddf$ID
+Height.cm <- cddf$Height.cm
+Handedness <- cddf$Handedness
+Dominant.Foot <- cddf$Dominant.Foot
+Dominant.Eye <- cddf$Dominant.Eye
+Year <- cddf$Year
+Sex <- cddf$Sex
+Number.Siblings <- cddf$Number.Siblings
+CircumferenceHead.com <- cddf$CircumferenceHead.com
+
+
+```
+
+
+```{r}
 #mean
 mean(Height.cm)
 
@@ -32,7 +49,7 @@ quantile(Height.cm, probs = c(0.25, 0.50, 0.75, 0.975))
 
 #confidence interval
 
-n <-with(Class.data, length(ID))
+n <-with(cddf, length(ID))
 m <-mean(Height.cm)
 s <-sd(Height.cm)
 
@@ -69,7 +86,7 @@ table(Handedness)
 ```
 ```{r}
 #g. Sex vs Height average
-y2 <-with(Class.data, tapply(Height.cm, Sex, mean))
+y2 <-with(cddf, tapply(Height.cm, Sex, mean))
 barplot(y2)
 
 ```

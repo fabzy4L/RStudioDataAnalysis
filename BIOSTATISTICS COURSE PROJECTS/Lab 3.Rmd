@@ -1,0 +1,99 @@
+---
+title: "Lab 3"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+#probability of successfully getting the correct answer on any given question?	
+p = 1/5
+p
+```
+
+```{r}
+#probability of getting exactly a grade of “B” (16/20) with random guessing.
+dbinom(16,20,p)
+```
+```{r}
+#getting a grade of “B” or better (with random guessing)
+dbinom(16,20,p) + dbinom(17,20,p) + dbinom(18,20,p) + dbinom(19,20,p) + dbinom(20,20,p)
+#or
+binom.test(16,20,p, alternative="greater")
+```
+```{r}
+#probability of getting at least 50% on this same test (with random guessing)
+dbinom(10,20,p)
+binom.test(10,20,p)
+```
+```{r}
+#Deaths before and after christmas CHI
+chisq.test(c(6052,(12028-6052)))
+
+#Since Chi^2 is smalles than Critical value, we cannot reject the Null hypothesis
+```
+```{r}
+#Deaths before and after BINOM
+binom.test(x=6052, n=12028, p=0.5)
+
+#Since Chi^2 is smalles than Critical value, we cannot reject the Null hypothesis
+# Chi^2 = 0.48021, Alpha = 0.05, df = 1, Critical Value = 3.84
+# CV > Chi^2
+```
+```{r}
+#EXPECTED FREQUENCIES
+lobsters <- matrix(c(7,9,11,5), nrow=2, dimnames=list("Shelter"=c("Empty", "Shared"), "Status"=c("Healthy", "Infected")))
+
+chisq.test(lobsters)$expected
+```
+```{r}
+#OBSERVED FREQUENCIES
+chisq.test(lobsters)$observed
+```
+```{r}
+#Chi Test
+chisq.test(lobsters) 
+# Since Chi^2 is smaller than Critical Value, we cannot reject the null 
+# Chi^2 = 1.14, Alpha = 0.05, df = 1, Critical Value = 3.84
+# CV > Chi^2
+```
+```{r}
+#Mosaic Plot
+mosaicplot(t(lobsters), color=c("red", "blue"), main="Lobsters")
+```
+
+
+```{r}
+#EXPECTED FREQUENCIES of Births
+births <- (c(33, 41, 63, 63, 47, 56, 47))
+timesxday<- (c(52, 52, 52, 52, 52, 53, 52))
+#All days but Friday (53) occured 52 times. The expected probability can be calculated by dividing the number of times the day occured over the total number of days in a year. That'll tell us the distribution of probability of being born a particular day. 
+
+expected.prob <- (timesxday/365)
+expected.prob
+```
+```{r}
+#Sum of Expected Probs
+sum(expected.prob)
+#the sum must equal 1
+```
+```{r}
+#Expected Probability of births per day // proportional
+B.prob <- expected.prob*350
+B.prob
+sum(B.prob)
+# The frequency is then calculated under the assumption of an equal expected distribution among days, to which they should add to 350 which is the total amount of births counted.
+
+```
+```{r}
+#Chi^2 Test of probabilities
+chisq.test(births, p= expected.prob)
+#This test will compare the observed vs. the expected probability of proportional births, and will tell us whether our hypothesis stands or not. 
+
+#In this case, Chi^2 = 15.057, Alpha = 0.05, df = 6, CV = 12.59 
+# Chi^2 > CV, THUS we can reject the Null hypothesis.
+```

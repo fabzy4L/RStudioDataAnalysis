@@ -11,9 +11,12 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 ```{r}
 #Question 1
-mammals
-```
-```{r}
+mammals <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/mammals.csv')
+
+name <- mammals$name
+body.mass..kg. <- mammals$body.mass..kg.
+brain.mass..g. <- mammals$brain.mass..g.
+
 #1A. Plot of Brain Mass Distribution. Histogram looks asymmetric, skewed towards the left. This is does not look like a normal disribution
 hist(brain.mass..g., xlab = "Brain Mass in grams")
 ```
@@ -45,7 +48,11 @@ qqnorm(y1, main = "Normality Quantile Plot")
 ```
 ```{r}
 #2. 
-snail.eating.snakes
+snail.eating.snakes <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/snail-eating snakes.csv')
+
+Species <- snail.eating.snakes$Species
+Asymmetry.score <- snail.eating.snakes$Asymmetry.score
+
 ```
 ```{r}
 #2A. Distribution of Asymmetry scores. Date does not look normal. **SKEWED TO THE LEFT**
@@ -62,9 +69,16 @@ t.test(Asymmetry.score)
 ```
 ```{r}
 #3. Data for Leg Shaving
-leg.shaving
-```
-```{r}
+leg.shaving <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/leg shaving.csv')
+
+#colnames(leg.shaving)
+
+Person <- leg.shaving$Person
+Hair.width.change...Control <- leg.shaving$Hair.width.change...Control
+Hair.width.change...Test <- leg.shaving$Hair.width.change...Test
+Hair.growth.change...Control <- leg.shaving$Hair.growth.change...Control
+Hair.growth.change...Test <- leg.shaving$Hair.growth.change...Test
+
 #3A. Two tail T-Test for Hair change. It is paired because it is a comparison of two groups: Control vs. Test, at two different dimensions. 
 shapiro.test(Hair.width.change...Control-Hair.width.change...Test)
 # P > 0.05, CANNOT REJECT H0, Shaving did not grow hair thicker. 
@@ -76,9 +90,22 @@ t.test(Hair.width.change...Control, Hair.width.change...Test, paired = TRUE, alt
 ```
 ```{r}
 #4.Bumpus Data
-bumpus
-```
-```{r}
+bumpus <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/bumpus.csv')
+
+BumpusNumber	<-	bumpus$BumpusNumber
+sex	<-	bumpus$sex
+age	<-	bumpus$age
+survival	<-	bumpus$survival
+Total.length.mm.	<-	bumpus$Total.length.mm.
+alar.extent.mm.	<-	bumpus$alar.extent.mm.
+weight.g.	<-	bumpus$weight.g.
+length.beak.and.head.mm.	<-	bumpus$length.beak.and.head.mm.
+length.humerus.in.	<-	bumpus$length.humerus.in.
+length.femur.in.	<-	bumpus$length.femur.in.
+length.tibiotarsus.in.	<-	bumpus$length.tibiotarsus.in.
+skull.width.in.	<-	bumpus$skull.width.in.
+keel.length.in.	<-	bumpus$keel.length.in.
+
 #4A.Dead V. Live Birds: Total Length. Data Looks NORMAL
 
 hist(Total.length.mm.)
