@@ -8,13 +8,14 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
+iris <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/iris.csv')
 iris
 ```
 
 
 ```{r}
-
 #1A. Discriminate Analysis to confirm correct classification
+library(MASS)
 iris.lda <- lda(iris$Species ~ iris$Sepal.Length+iris$Sepal.Width+iris$Petal.Length+iris$Petal.Width, CV=TRUE)
 correct <- table(iris$Species, iris.lda$class)
 diag(prop.table(correct,1))
@@ -52,6 +53,7 @@ biplot(pca1, xlim= c(-0.3,0.3), ylab="Axis 2", xlab="Axis 1")
 
 ```
 ```{r}
+library(rpart)
 TREE <- rpart(iris$Species~ iris$Sepal.Length+iris$Sepal.Width+iris$Petal.Length+iris$Petal.Width)
 TREE
 TREE2 <- rpart(iris$Species~ iris$Sepal.Length+iris$Sepal.Width)
@@ -75,10 +77,4 @@ text (TREE, xpd=NA)
 plot(TREE2)
 text (TREE2, xpd=NA)
 ```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 

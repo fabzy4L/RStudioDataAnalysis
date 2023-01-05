@@ -3,14 +3,19 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
 ```{r}
-TreeData
-```
-```{r}
+TreeData <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/TreeData.csv')
+Site<-TreeData$Site
+Biomass<-TreeData$Biomass
+ABPR<-TreeData$ABPR
+StandAge<-TreeData$StandAge
+x<-TreeData$x
+y<-TreeData$y
+elev<-TreeData$elev
+Northeastness<-TreeData$Northeastness
+Slope<-TreeData$Slope
+SlopePos<-TreeData$SlopePos
+
 ABPR2<-as.factor(ABPR)
 # Biomass is correlated to STAND AGE, X, Y, ELEV AND NORTHEASTNESS
 # STRONGEST correlations to Biomass  are Y, ELEV, SLOPE  (BIOMASS,Y = 0.51121715// BIOMASS,ELEV= 0.63768070 // BIOMASS, SLOPE is negative =  -0.59534039)
@@ -64,9 +69,11 @@ bm.sw <- lm(TreeData$Biomass ~ TreeData$ABPR + TreeData$StandAge +  TreeData$ele
 shapiro.test((resid(bm.sw)))
 ```
 ```{r}
-GATOR
-```
-```{r}
+GATOR <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/GATOR.csv')
+sex<-GATOR$sex
+snout.vent<-GATOR$snout.vent
+pelvic.width<-GATOR$pelvic.width
+
 m.gator <- GATOR[1:19, 1:3]
 f.gator <- GATOR[20:35, 1:3]
 #Data are normal.

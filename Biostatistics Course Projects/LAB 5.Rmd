@@ -3,15 +3,12 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
 ```{r}
 #1. Daphnia
-daphnia
-```
-```{r}
+daphnia <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/daphnia.csv')
+cyandensity <- daphnia$cyandensity
+resistance <- daphnia$resistance
+  
 
 #1. Shapiro Test for normality. If p < 0.05 = reject hypothesis (i.e Data are NOT normal). P > 0.05, DATA are normal.
 shapiro.test(resistance)
@@ -56,9 +53,11 @@ plot(tukey)
 ```
 ```{r}
 #2. Circadian Mutant Health
-circadian.mutant.health
-```
-```{r}
+circadian.mutant.health <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/circadian mutant health.csv')
+
+Genotype <- circadian.mutant.health$Genotype
+Time.to.death..days. <- circadian.mutant.health$Time.to.death..days.
+
 #2. Histogram for normality. DATA ARE NOT NORMAL
 hist(Time.to.death..days.)
 ```
@@ -78,7 +77,10 @@ kruskal.test(Time.to.death..days.~Genotype)
 ```
 ```{r}
 #THERE IS NO DIFFERENCE BETWEEN tim01.res & wild type genotype, however, tim01 is significantly different to the other groups.
+library(pgirmess)
 kruskalmc(Time.to.death..days.~Genotype)
+
+
 ```
 
 ```{r}
@@ -89,13 +91,19 @@ text(3, 25, "A")
 ```
 ```{r}
 #3.  Protein
-protein.fitness
-```
+protein.fitness <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/BIOSTATISTICS COURSE PROJECTS/protein.fitness.csv')
+Gender<-protein.fitness$Gender
+Protein.in.diet<- protein.fitness$Protein.in.diet
+Fitness.score <- protein.fitness$Fitness.score
 
-```{r}
 #3. Shapiro test for normality
+par(mfrow=c(2,2))
 hist(Fitness.score)
 qqnorm(Fitness.score)
+```
+
+
+```{r}
 shapiro.test(Fitness.score) #"Data is normal"
 ```
 ```{r}
