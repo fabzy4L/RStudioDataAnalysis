@@ -4,7 +4,7 @@ output: html_notebook
 ---
 
 ```{r}
-dna<-read.csv('/Users/f4L/Library/Containers/com.microsoft.Excel/Data/Downloads/DNA/FAP_RAW_DNA.csv')
+dna<-read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/FAP_RAW_DNA.csv')
 
 RSID <- dna$RSID
 
@@ -21,8 +21,17 @@ dna
 
 
 ```{r}
-#library(BiocManager)
+#https://uswest.ensembl.org/info/data/biomart/biomart_r_package.html
 
+#https://support.bioconductor.org/p/9135301/
+
+#snp_mart <- biomaRt::useMart(biomart="ENSEMBL_MART_SNP", host="grch37.ensembl.org", path="/biomart/martservice", dataset="hsapiens_snp")
+```
+
+
+```{r}
+library(BiocManager)
+library(biomaRt)
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("biomaRt")
@@ -30,14 +39,71 @@ BiocManager::install("biomaRt")
 
 
 ```{r}
+library(biomaRt)
+
+#Get all the marts names
+#listMarts()
+
+#select a mart to obtain dataset
+#ensembl <- useMart("ENSEMBL_MART_SNP")
+
+#Dataset obtained
+#listDatasets(ensembl)
+
+#Choose Mart & Dataset so we can set filters
+ensembl=useMart("ENSEMBL_MART_SNP", dataset= "hsapiens_snp")
+
+#create filter list so we can check criteria
+myfilters <- listFilters(ensembl)
+
+#Make a vector for the filter 
+filter1 <- 'snp_filter'
+
+#Attributes
+attributes1 <- listAttributes(ensembl)
+att1 <- c('refsnp_id','snp','allele','chr_name', 'minor_allele', 'minor_allele_freq','associated_gene','phenotype_description' )
+
+rsdf1 <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/RSID2.txt')
+rsdf <- rsdf1[1:200,]
+rsdf
+
+searchResults <- getBM(attributes=att1,
+                       filters=filter1,
+                       values=rsdf, mart=ensembl)
 
 ```
 
-#https://uswest.ensembl.org/info/data/biomart/biomart_r_package.html
 
-#https://support.bioconductor.org/p/9135301/
+```{r}
+#Export Data
+#write.csv(searchResults, file='/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/rsid_1_200.csv',row.names=FALSE,na='', quote=FALSE)
+```
 
-#snp_mart <- biomaRt::useMart(biomart="ENSEMBL_MART_SNP", host="grch37.ensembl.org", path="/biomart/martservice", dataset="hsapiens_snp")
+
+```{r}
+#Import to clean
+library(dplyr)
+
+rsid200 <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/rsid_1_200.csv')
+rsid200_a <- rsid200[order(decreasing = TRUE, rsid200$phenotype_description),]
+rsid200_a
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+#Exported the data into a TXT file from the csv - easier to work.
+
+#RSID2<- data.frame(RSID)
+#RSID2
+#write.csv(RSID2, file='/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/RSID2.txt',row.names=FALSE,na='', quote=FALSE)
+```
+
+
 
 
 ```
