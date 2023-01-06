@@ -15,17 +15,13 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 
 ```{r}
-meta = Affymetrix_miRNA2
 
-data = rma.sketch.summary
+library(affy)
+library(RCurl)
+
+meta <- read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/TRANSCRIPTOMICS/Affymetrix_miRNA2.txt'), sep = "\t", stringsAsFactors = TRUE)
+data = read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/TRANSCRIPTOMICS/rma-sketch.summary.txt'), sep = "\t", stringsAsFactors = TRUE)
 ```
-
-
-```{r}
-data
-
-```
-
 
 ```{r}
 
@@ -38,6 +34,7 @@ str(meta)
 ```{r}
 
 str(data)
+
 ```
 
 
