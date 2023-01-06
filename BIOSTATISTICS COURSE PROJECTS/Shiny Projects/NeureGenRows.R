@@ -39,62 +39,47 @@ ui <- fluidPage(theme = shinytheme(theme),
                                            label = 'Select Service', # Label of field
                                            choices = list)), #list of values from current wd (working directory - pathname)
                            # Input: Select a file ----
-                             fileInput("file1", "Search",
-                                       multiple = TRUE,
-                                       accept = c("text/csv",
-                                                  "text/comma-separated-values,text/plain",
-                                                  ".csv")),
-                      
+                           fileInput("file1", "Choose CSV File",
+                                     accept = c(
+                                       "text/csv",
+                                       "text/comma-separated-values,text/plain",
+                                       ".csv")
+                           ),
+                           tags$hr(),
+                           checkboxInput("header", "Header", TRUE)
                            ), # sidebarPanel
-                           mainPanel(
-                             h1("Review Information:"),
-                             
-                             h4("Output:"),
+                  mainPanel(h1("Review Information:"), 
+                            h4("Output:"),
                              helpText("Please make sure the file contains RSIDs"),
                              h1(" "),
                              verbatimTextOutput("txtout"), # name & last name
-                             #verbatimTextOutput("txtout2"), #typed request
-                             verbatimTextOutput("txtout3"), #file name
                              verbatimTextOutput("txtout4"), #request type - ddmenu
-    
+                             verbatimTextOutput("txtout3"), #file name
+                             
+                             dataTableOutput('dto')
                            )
                         # mainPanel
                            
-                  ), # Navbar 1, tabPanel 1
-                  tabPanel("Upload Other Files",
-                           mainPanel(
-                             h1("Upload .csv file"),
-                             #h4("Output:"),
-                             #actionButton("action", "Select File"),
-                             #Input: Select a file ----
-                             fileInput("file1", "Search",
-                                       multiple = TRUE,
-                                       accept = c("text/csv",
-                                                  "text/comma-separated-values,text/plain",
-                                                  ".csv")),
-                           ) # mainPanel
-                           
-                  ), # Navbar 2, tabPanel2
-                  
-                  
-                  
+                  ) # Navbar 1, tabPanel 1
 #########################################This Tabpanel interferes with the mainpanel from tabapnel1
           
-#                  tabPanel("Services",
-#                           mainPanel(fluidRow(
-#                             selectInput('txt4', #variable name
-#                                         label = 'Select Service', # Label of field
-#                                         choices = list),
-#                             verbatimTextOutput('txtout4'), #text output from function that created directory
-                             #uiOutput('file_selector')
-#)
-#                           )
-#                  ),
-                 # tabPanel("FAQ", "This panel is intentionally left blank"), 
 
+#                      tabPanel("Services",
+#                                    mainPanel(fluidRow(
+#                                      fileInput("file1", "Choose CSV File",
+#                                                accept = c(
+#                                                  "text/csv",
+#                                                  "text/comma-separated-values,text/plain",
+#                                                  ".csv")
+#                                                ),
+#                                      tags$hr(),
+#                                      checkboxInput("header", "Header", TRUE)
+#                                      ),
+#                                      dataTableOutput('dto'),
+#                                      )
+#         )
+))
 #########################################
-                )
-                )
 
 ##############################################
 # navbarPage
@@ -117,11 +102,33 @@ server <- function(input, output) {
     paste0( "File:", input$file1, sep = " " )
   })
   
-  output$txtout4 <- renderText(paste0('Service: ', input$txt4))
+  output$txtout4 <- renderText(
+    {paste0('Service: ', input$txt4)
+      })
   
-  } # server
-
-
+  # Reactive expression with the data, in this case iris
+  #----------------
+  contents <- reactive({
+    # input$file1 will be NULL initially. After the user selects
+    # and uploads a file, it will be a data frame with 'name',
+    # 'size', 'type', and 'datapath' columns. The 'datapath'
+    # column will contain the local filenames where the data can
+    # be found.
+    inFile <- input$file1
+    
+    if (is.null(inFile)) return(NULL)
+    
+    read.csv(inFile$datapath, header = input$header)
+    
+  })
+  #----------------
+  
+  #the extensions parameter coupled with the options list does the trick  
+  output$dto <- renderDataTable(contents(), #extensions = 'Buttons',
+                                    options = list(dom = 'Bfrtip',
+                                               buttons = c('copy', 'csv', 'excel', 'pdf', 'print'))
+  )
+}
 # PART 3. INTEGRATION of Shiny object = User Interface & server function defined
 
 shinyApp(ui = ui, server = server)

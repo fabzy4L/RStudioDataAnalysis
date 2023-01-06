@@ -4,21 +4,38 @@ output: html_notebook
 ---
 
 ```{r}
-dna<-read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/FAP_RAW_DNA.csv')
+library(data.table)
+library(RCurl)
+library(randomForest)
+library(dplyr)
+library(tidyverse)
+library(biomaRt)
 
-RSID <- dna$RSID
 
-CHROMOSOME <- dna$CHROMOSOME
+dna <- read.csv(text = getURL("https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/DNA/AlvarezPrimo_MyHeritage_Raw_DNA.csv") )
 
-POSITION <- dna$POSITION
+dna <- dna[7:720822,]
 
-RESULT <- dna$RESULT
+dna <- dna %>% 
+  rename(
+    refsnp_id = X..MyHeritage.DNA.raw.data.,
+    CHROMOSOME = X,
+    POSITION = X.1,
+    RESULT = X.2
+    )
 
-dna
-
-#HOW CAN I FIND RSID IN NCBI
+dna1 <- dna[1:1000,]
 ```
 
+
+```{r}
+# CHOP FILE INTO LESS NUMBERS
+dna2 <- dna[1001:2000,]
+dna3 <- dna[2001:3000,]
+dna4 <- dna[3001:4000,]
+
+#RSID	CHROMOSOME	POSITION	RESULT
+```
 
 ```{r}
 #https://uswest.ensembl.org/info/data/biomart/biomart_r_package.html
@@ -26,15 +43,12 @@ dna
 #https://support.bioconductor.org/p/9135301/
 
 #snp_mart <- biomaRt::useMart(biomart="ENSEMBL_MART_SNP", host="grch37.ensembl.org", path="/biomart/martservice", dataset="hsapiens_snp")
-```
 
-
-```{r}
-library(BiocManager)
-library(biomaRt)
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("biomaRt")
+#library(BiocManager)
+#library(biomaRt)
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install("biomaRt")
 ```
 
 
@@ -63,20 +77,48 @@ filter1 <- 'snp_filter'
 attributes1 <- listAttributes(ensembl)
 att1 <- c('refsnp_id','snp','allele','chr_name', 'minor_allele', 'minor_allele_freq','associated_gene','phenotype_description' )
 
-rsdf1 <- read.csv('/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/RSID2.txt')
-rsdf <- rsdf1[1:200,]
-rsdf
 
 searchResults <- getBM(attributes=att1,
                        filters=filter1,
-                       values=rsdf, mart=ensembl)
+                       values=dna1, mart=ensembl)
+```
+
+
+```{r}
+searchResults2 <- getBM(attributes=att1,
+                       filters=filter1,
+                       values=dna2, mart=ensembl)
+
+searchResults3 <- getBM(attributes=att1,
+                       filters=filter1,
+                       values=dna3, mart=ensembl)
+
+searchResults4 <- getBM(attributes=att1,
+                       filters=filter1,
+                       values=dna4, mart=ensembl)
+
+```
+
+
+```{r}
+srd1 <- merge(dna1, searchResults, by="refsnp_id")
+```
+
+
+```{r}
+srd2 <- merge(dna2, searchResults2, by="refsnp_id")
+srd3 <- merge(dna3, searchResults3, by="refsnp_id")
+srd4 <- merge(dna4, searchResults4, by="refsnp_id")
+
 
 ```
 
 
 ```{r}
 #Export Data
-#write.csv(searchResults, file='/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/rsid_1_200.csv',row.names=FALSE,na='', quote=FALSE)
+
+write.csv(srd1, file='/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/rsid_srd1.csv',row.names=FALSE,na='', quote=FALSE)
+
 ```
 
 
@@ -101,6 +143,8 @@ rsid200_a
 #RSID2<- data.frame(RSID)
 #RSID2
 #write.csv(RSID2, file='/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/RSID2.txt',row.names=FALSE,na='', quote=FALSE)
+write.csv(dna_2, file='/Users/f4L/Documents/GitHub/RStudioDataAnalysis/DNA/DNA_2.csv',row.names=FALSE,na='', quote=FALSE)
+
 ```
 
 
