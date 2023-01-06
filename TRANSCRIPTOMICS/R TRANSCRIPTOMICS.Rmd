@@ -1,0 +1,141 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+# # THIS ERASES EVERYTHING
+# rm(list=ls())
+
+```
+
+
+```{r}
+meta = Affymetrix_miRNA2
+
+data = rma.sketch.summary
+```
+
+
+```{r}
+data
+
+```
+
+
+```{r}
+
+str(meta)
+
+```
+
+
+
+```{r}
+
+str(data)
+```
+
+
+```{r}
+# keep only mature miRNA
+idx.hsa = grep("^hsa-", data$probeset_id) 
+X = as.matrix(data[idx.hsa,-1])
+rownames(X) = data[idx.hsa,1]
+
+group = factor(sub("[.].+","",meta$name))
+color = rainbow(10)[as.integer(group)]
+
+## see data distribution
+plot(density(X),lwd=2)
+for (i in 1:ncol(X)) lines(density(X[,i]),col=color[i])
+abline(v=5,col="green")
+
+```
+
+
+```{r}
+
+## how many genes are expressed?
+idx.expr = apply(X,1,max)>5
+sum(idx.expr)
+
+```
+
+
+```{r}
+## let's filter out non-expressed
+X = X[idx.expr,]
+
+## perform PCA
+PC = prcomp(t(X))
+str(PC)
+```
+
+
+```{r}
+
+plot(PC$x[,1],PC$x[,2],col=color,cex=2,pch=19)
+
+
+```
+
+
+```{r}
+
+## perform DEA
+library(limma)
+design=model.matrix(~ -1 + group)
+str(design)
+
+```
+
+
+```{r}
+browseVignettes("limma")
+
+```
+
+
+```{r}
+colnames(design)=sub("group","",colnames(design))
+fit = lmFit(X,design=design)
+contrast.matrix=makeContrasts(T24-T000, T48-T000, T72-T000, levels=design)
+fit2 = contrasts.fit(fit,contrast.matrix)
+EB = eBayes(fit2)
+TopGeneTable = topTable(EB,number=nrow(X),adjust="BH")
+str(TopGeneTable)
+```
+
+
+```{r}
+##now lets see for each pair
+Res24 = topTable(EB,
+                 coef="T24 - T000",
+                 number=nrow(X),
+                 adjust="BH",
+                 sort.by="none",
+                 genelist=row.names(X))
+
+idx = (TopGeneTable$adj.P.Val < 0.05)
+
+heatmap(t(scale(t(X[idx,]))),
+        Colv = NA,
+        ColSideColors=color,
+        scale="none",
+        col = colorRampPalette (c("blue","wheat","red"))(1000))
+```
+
+
+```{r}
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
