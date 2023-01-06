@@ -1,115 +1,174 @@
 ---
-title: "R Notebook"
+title: "Affymetrix Transcriptomics"
 output: html_notebook
 ---
-
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
 # # THIS ERASES EVERYTHING
 # rm(list=ls())
 
+
+# INSTALL ARRAY EXPRESS 
+#if (!require("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#
+#BiocManager::install("ArrayExpress")
+
+#browseVignettes("ArrayExpress")
 ```
 
 
 ```{r}
-
 library(affy)
+library(ArrayExpress)
+library(limma)
 library(RCurl)
+```
 
+
+```{r}
 meta <- read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/TRANSCRIPTOMICS/Affymetrix_miRNA2.txt'), sep = "\t", stringsAsFactors = TRUE)
-data = read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/TRANSCRIPTOMICS/rma-sketch.summary.txt'), sep = "\t", stringsAsFactors = TRUE)
+data = read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/TRANSCRIPTOMICS/rma-sketch.summary.txt'), sep = "\t")
 ```
 
-```{r}
 
+```{r}
+meta
+data
+```
+
+
+```{r}
 str(meta)
-
-```
-
-
-
-```{r}
-
 str(data)
+```
 
+
+
+
+```{r}
+#############################
+
+# keep only mature miRNA
+idx.hsa = grep(pattern = "^hsa-", 
+               x = data$probeset_id) 
+
+# This function creates a list of row numbers (index) of the probeset_id datapoints that match pattern = '^hsa- (Homo Sapiens) to create a subset.
+
+# idx.hsa # - Produces a list with the position of the values that matched probeset_id 
+
+X = as.matrix(data[idx.hsa,-1]) # Makes a data matrix by matching the index to the original dataframe to retrieve subset of rows minus probeset_id col
+
+rownames(X) = data[idx.hsa,1] #  adds names to datamatrix created, filterd under the same criterion to match
+
+group = factor(sub(pattern = "[.].+",
+                   replacement = "",
+                   x = meta$name)) #removes decimal points in rows from name column in meta dataframe, so we can assign these names to the colums later
 ```
 
 
 ```{r}
-# keep only mature miRNA
-idx.hsa = grep("^hsa-", data$probeset_id) 
-X = as.matrix(data[idx.hsa,-1])
-rownames(X) = data[idx.hsa,1]
-
-group = factor(sub("[.].+","",meta$name))
-color = rainbow(10)[as.integer(group)]
+par(mfrow=c(2,1))
 
 ## see data distribution
 plot(density(X),lwd=2)
-for (i in 1:ncol(X)) lines(density(X[,i]),col=color[i])
-abline(v=5,col="green")
+color = rainbow(10)[as.integer(group)] # color variable - 10 colors && 
 
+#group = T000 T000 T005 T005 T03  T03  T06  T06  T12  T12  T24  T24  T48  T48  T72  T72  T96  T96 (n=18)
+#group as integer = 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 (n=18)
+
+# FXN for n colors equivalent to n number of datapoints
+
+for (i in 1:ncol(X)) # i = 18 , 1:ncol(X) = 1:18 <=> ncol(X) number of columns, thus 1:ncol(X) is 1:18
+  lines(density(X[,i]), # X dataframe, all rows, 1:18 colums
+        col=color[i]) #color variable for i number of variables as determined by 1
+  
+abline(v=5, # vertical = 5 (v=5) // horizontal = (?) (h=?)
+       col="red") 
+
+hist(X, 
+     main='Histogram', 
+     xlab='Frequency'
+     )
 ```
 
 
 ```{r}
 
 ## how many genes are expressed?
-idx.expr = apply(X,1,max)>5
-sum(idx.expr)
+idx.expr = apply(X, #data
+                 1, #margin selected: 1 for rows, 2 for columns
+                 max)>5 #function is to capture max value per row
+#Expression threshold is 5
+#boolean operation: If the max value collected by the apply function, from each individual row is greater than 5, then this operation is true
+
+sum(idx.expr) #sum all true values
 
 ```
 
 
 ```{r}
 ## let's filter out non-expressed
-X = X[idx.expr,]
+X = X[idx.expr,] # subset data by filtering through expression threshold criteria
 
-## perform PCA
+## perform PCA - Principal Component Analysis
 PC = prcomp(t(X))
-str(PC)
+#str(PC)
+#PC # not processed
+#PC$x # processed 
 ```
 
-
 ```{r}
-
+## perform PCA - Principal Component Analysis
 plot(PC$x[,1],PC$x[,2],col=color,cex=2,pch=19)
-
-
+# x = PC$x[,1] = row 1
+# y = PC$x[,2] = row 2
+# col = color = rainbow(10)[as.integer(group)]
 ```
 
 
 ```{r}
+## perform DEA (limma)
+##browseVignettes("limma")
 
-## perform DEA
-library(limma)
+
 design=model.matrix(~ -1 + group)
-str(design)
 
+#str(design) #chr - 18 characters / chr - 9 groups
+design
 ```
 
 
-```{r}
-browseVignettes("limma")
-
-```
-
 
 ```{r}
-colnames(design)=sub("group","",colnames(design))
-fit = lmFit(X,design=design)
-contrast.matrix=makeContrasts(T24-T000, T48-T000, T72-T000, levels=design)
-fit2 = contrasts.fit(fit,contrast.matrix)
-EB = eBayes(fit2)
-TopGeneTable = topTable(EB,number=nrow(X),adjust="BH")
-str(TopGeneTable)
-```
+colnames(design)=sub("group", #Remove word Group
+                     "",
+                     colnames(design)) # naming columns in desgin df,
+
+fit = lmFit(X,
+            design=design) #linear model acording to matrix
 
 
-```{r}
+contrast.matrix=makeContrasts(T24-T000, #range groups
+                              T48-T000, 
+                              T72-T000, 
+                              levels=design) #Construct a user-specified contrast matrix. ####   make.contrasts(contr, how.many = ncol(contr))
+
+
+fit2 = contrasts.fit(fit,
+                     contrast.matrix) # Given a linear model fit to microarray data, compute estimated coefficients and standard errors for a given set of contrasts.
+
+
+EB = eBayes(fit2) # eBayes (limma) Given a microarray linear model fit, compute moderated t-statistics, moderated F-statistic, and log-odds of differential expression by empirical Bayes moderation of the standard errors towards a common value.
+
+TopGeneTable = topTable(EB, #Extract a table of the top-ranked genes from a linear model fit.
+                        number=nrow(X), #all rows assoc to df = X
+                        adjust="BH")
+
+#The adjustment methods include the Bonferroni correction ("bonferroni") in which the p-values are multiplied by the number of comparisons. Less conservative corrections are also included by Holm (1979) ("holm"), Hochberg (1988) ("hochberg"), Hommel (1988) ("hommel"), Benjamini & Hochberg (1995) ("BH" or its alias "fdr"), and Benjamini & Yekutieli (2001) ("BY"), respectively. A pass-through option ("none") is also included. The set of methods are contained in the p.adjust.methods vector for the benefit of methods that need to have the method as an option and pass it on to p.adjust.
+
+str(TopGeneTable) #confirm attributes
+
 ##now lets see for each pair
 Res24 = topTable(EB,
                  coef="T24 - T000",
@@ -118,21 +177,38 @@ Res24 = topTable(EB,
                  sort.by="none",
                  genelist=row.names(X))
 
-idx = (TopGeneTable$adj.P.Val < 0.05)
+Res24
+idx = (TopGeneTable$adj.P.Val < 0.05) # Boolean Filter
+```
 
-heatmap(t(scale(t(X[idx,]))),
+
+```{r}
+EB
+```
+
+
+```{r}
+TopGeneTable
+```
+
+
+```{r}
+fit2
+```
+
+
+```{r}
+fit
+
+fit2
+
+contrast.matrix
+```
+
+```{r}
+heatmap(t(scale(t(X[idx,]))), #heatmap of the scaled transposed filtered data w/ P > 0.5 // the double transposition affects the data processing
         Colv = NA,
         ColSideColors=color,
         scale="none",
         col = colorRampPalette (c("blue","wheat","red"))(1000))
 ```
-
-
-```{r}
-```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
