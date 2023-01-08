@@ -19,10 +19,12 @@ output: html_notebook
 
 
 ```{r}
+library(BiocGenerics)
 library(affy)
 library(ArrayExpress)
 library(limma)
 library(RCurl)
+library(dplyr)
 ```
 
 
@@ -94,45 +96,51 @@ hist(X,
 
 
 ```{r}
+###FILTERING THE DATA BY EXPRESSION 
 
 ## how many genes are expressed?
+
 idx.expr = apply(X, #data
                  1, #margin selected: 1 for rows, 2 for columns
                  max)>5 #function is to capture max value per row
 #Expression threshold is 5
 #boolean operation: If the max value collected by the apply function, from each individual row is greater than 5, then this operation is true
 
-sum(idx.expr) #sum all true values
+#sum(idx.expr) #sum all true values (index values w expression > 5) = 239
 
-```
-
-
-```{r}
 ## let's filter out non-expressed
-X = X[idx.expr,] # subset data by filtering through expression threshold criteria
+X = X[idx.expr,] # subset data by filtering through expression threshold criteria ( x > 5 )
 
 ## perform PCA - Principal Component Analysis
-PC = prcomp(t(X))
+
+PC = prcomp(t(X)) # transposed // The prcomp function takes in the data as input, and it is highly recommended to set the argument scale=TRUE. This standardize the input data so that it has zero mean and variance one before doing PCA. We have stored the results from prcomp and the resulting object has many useful variables associated with the analysis.
+
 #str(PC)
 #PC # not processed
 #PC$x # processed 
-```
 
-```{r}
+
+threshold = c(-15,15)
+colors1=c("red", "blue")
+
 ## perform PCA - Principal Component Analysis
-plot(PC$x[,1],PC$x[,2],col=color,cex=2,pch=19)
+plot(PC$x[,1],PC$x[,2],col=colors1,cex=2,pch=19, xlim=threshold, ylim=threshold)
+#abline(v=-5.1621198,col='red')
+#abline(h=-5.1621198,col='red')
+
 # x = PC$x[,1] = row 1
 # y = PC$x[,2] = row 2
 # col = color = rainbow(10)[as.integer(group)]
+
 ```
 
 
 ```{r}
 ## perform DEA (limma)
 ##browseVignettes("limma")
+group # SET UP IS AS FOLLOWS  = T000 T000 T005 T005 T03  T03  T06  T06  T12  T12  T24  T24  T48  T48  T72  T72  T96  T96 
 
-
-design=model.matrix(~ -1 + group)
+design=model.matrix(~ -1 + group) # make group a matrix model, where -1 removes the intercept, leaving just the matrix
 
 #str(design) #chr - 18 characters / chr - 9 groups
 design
@@ -141,13 +149,21 @@ design
 
 
 ```{r}
-colnames(design)=sub("group", #Remove word Group
-                     "",
-                     colnames(design)) # naming columns in desgin df,
+colnames(design)=sub("group", #find pattern "Group"
+                     "", # replace with blank space
+                     colnames(design)) # do the replacing while naming columns in desgin df
+design
+```
+
+
+```{r}
+
+# Fitting the X dataframe (filtered relevant hsa data) into the design as a matrix model
 
 fit = lmFit(X,
             design=design) #linear model acording to matrix
 
+#making a contrast matrix with the same design as matrix model, however ranged at T24, T48,T72
 
 contrast.matrix=makeContrasts(T24-T000, #range groups
                               T48-T000, 
@@ -155,54 +171,68 @@ contrast.matrix=makeContrasts(T24-T000, #range groups
                               levels=design) #Construct a user-specified contrast matrix. ####   make.contrasts(contr, how.many = ncol(contr))
 
 
+
 fit2 = contrasts.fit(fit,
                      contrast.matrix) # Given a linear model fit to microarray data, compute estimated coefficients and standard errors for a given set of contrasts.
 
 
-EB = eBayes(fit2) # eBayes (limma) Given a microarray linear model fit, compute moderated t-statistics, moderated F-statistic, and log-odds of differential expression by empirical Bayes moderation of the standard errors towards a common value.
+EB = eBayes(fit2) # eBayes (limma) Given a microarray linear model fit, compute moderated t-statistics, moderated F-statistic, and log-odds of differential expression by empirical Bayes moderation of the standard errors towards a common value. EB evaluates the fit2 model.
 
+#create a table with EB
 TopGeneTable = topTable(EB, #Extract a table of the top-ranked genes from a linear model fit.
                         number=nrow(X), #all rows assoc to df = X
                         adjust="BH")
 
 #The adjustment methods include the Bonferroni correction ("bonferroni") in which the p-values are multiplied by the number of comparisons. Less conservative corrections are also included by Holm (1979) ("holm"), Hochberg (1988) ("hochberg"), Hommel (1988) ("hommel"), Benjamini & Hochberg (1995) ("BH" or its alias "fdr"), and Benjamini & Yekutieli (2001) ("BY"), respectively. A pass-through option ("none") is also included. The set of methods are contained in the p.adjust.methods vector for the benefit of methods that need to have the method as an option and pass it on to p.adjust.
 
-str(TopGeneTable) #confirm attributes
+#str(TopGeneTable) #confirm attributes
 
-##now lets see for each pair
+##now lets see for each pair - create table 
 Res24 = topTable(EB,
-                 coef="T24 - T000",
-                 number=nrow(X),
-                 adjust="BH",
+                 coef="T24 - T000", #	column number or column name specifying which coefficient or contrast of the linear model is of interest. For topTable, can also be a vector of column subscripts, in which case the gene ranking is by F-statistic for that set of contrasts.
+                 number=nrow(X), #maximum number of genes to list
+                 adjust="BH", 
                  sort.by="none",
-                 genelist=row.names(X))
+                 genelist=row.names(X)) #Dataframe or character vector containing gene information
 
-Res24
 idx = (TopGeneTable$adj.P.Val < 0.05) # Boolean Filter
 ```
 
-
 ```{r}
-EB
+library(dplyr)
+select(TopGeneTable, -T24...T000, -T48...T000, -T72...T000)
 ```
 
 
 ```{r}
-TopGeneTable
+EB$p.value
+
 ```
 
 
 ```{r}
-fit2
+select(Res24, -ID, -logFC, -t, -B)
+```
+
+```{r}
+data.frame(rowMeans(fit$coefficients)) #values are the same for average expression between fit & res24
+#dna <- dna %>% 
+#  rename(
+#    refsnp_id = X..MyHeritage.DNA.raw.data.,
+#    CHROMOSOME = X,
+#    POSITION = X.1,
+#    RESULT = X.2
+#    )
 ```
 
 
 ```{r}
-fit
-
-fit2
-
 contrast.matrix
+```
+
+
+```{r}
+fit2$design
 ```
 
 ```{r}
