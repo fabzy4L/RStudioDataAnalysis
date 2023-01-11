@@ -25,6 +25,11 @@ fitiv <- read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStud
 fitiv <- fitiv[1:344,]
 
 
+fitiv
+```
+
+
+```{r}
 data_2023 <- mmr[1,]
 data_2017 <- mmr[2:10,]
 data_2016 <- mmr[11:30,]
@@ -185,6 +190,9 @@ d = time_var*0.07703 + 0.23611
 
 
 ```{r}
+
+time2017/
+
 plot(dates_2017,time2017, ylab="Time (mins)", xlab="Dates" )
 #points(dat)
 ```
