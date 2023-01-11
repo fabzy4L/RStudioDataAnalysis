@@ -17,11 +17,13 @@ library(dplyr)
 
 ```{r}
 mmr <- read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/MapMyRun/mapmyrun%20-%20data.csv'))
+fitiv <- read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/MapMyRun/fitiv_01_10_23.csv'))
 ```
 
 
 ```{r}
-mmr
+fitiv <- fitiv[1:344,]
+
 
 data_2023 <- mmr[1,]
 data_2017 <- mmr[2:10,]
@@ -79,11 +81,15 @@ mmr3
 #mmr2 <- mmr2[7:30,]
 WTM <- mmr2$Workout.Time..seconds./60
 HR <- mmr2$Avg.Heart.Rate
-#wtm2016 <- WTM[]
-#wtm2017 <-
-#wtm2023 <- 
 
-plot(mmr2$Calories.Burned..kCal.~HR, ylab = "kCals Burned", xlab= "HR (BPM)", ylim=c(0,500), xlim=c(100,200))
+
+
+## DATA EXTRACTED FROM FITIV - AVERAGE OF HR THROUGHOUT 01/10/23 SESSION
+fitivHR <- mean(fitiv$HR..BPM.)
+fitivkcal <- c(474)
+
+plot(mmr2$Calories.Burned..kCal.~HR, pch=0, ylab = "kCals Burned", xlab= "HR (BPM)", ylim=c(0,500), xlim=c(100,200))
+points(fitivkcal~fitivHR, col='red')
 #points(data_2023$Calories.Burned..kCal.~data_2023$Distance..mi., col = 'green')
 #points(data_2017$Calories.Burned..kCal.~data_2017$Distance..mi., col = 'purple')
 #points(data_2016$Calories.Burned..kCal.~data_2016$Distance..mi., col = 'red')
@@ -103,7 +109,6 @@ abline(v=171, col='red')
 
 
 ```{r}
-
 
 
 
@@ -146,16 +151,38 @@ abline(h=1.75,col='blue')
 
 
 ```{r}
-#minspermile <- 1/((distance2017)/(time2017))
+minspermile <- 1/((distance2017)/(time2017))
 #mean(minspermile)
 
-
-plot(distance2017~time2017)
-abline(lm(distance2017~time2017))
+plot(distance2017~time2017,
+     main="2017",
+     xlab="Time (mins)",
+     ylab="Distance (mi)",
+     xlim=c(0,40),
+     ylim=c(0,3))
+abline(lm(distance2017~time2017), col='red')
 abline(h=1.877569, col='purple')
-text(20,2," Avg mins/mile = 11.32406 ")
+text(10,2," Avg = 11:19 mins/mile ")
 #text(20,2," Mean Time 2017 = 21.31")
 ```
+
+```{r}
+
+### LM FOR 2017
+
+lm(distance2017~time2017)
+
+# y = mx + b
+# v = d/t
+
+
+time_var = 11.32 #mins
+d = time_var*0.07703 + 0.23611
+# d ~ 1.11 miles
+
+
+```
+
 
 ```{r}
 plot(dates_2017,time2017, ylab="Time (mins)", xlab="Dates" )
@@ -164,5 +191,5 @@ plot(dates_2017,time2017, ylab="Time (mins)", xlab="Dates" )
 
 
 ```{r}
-interaction.plot(time2017,dates_2017,distance2017)
+#interaction.plot(time2017,dates_2017,distance2017)
 ```
