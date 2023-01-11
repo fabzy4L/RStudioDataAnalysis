@@ -13,6 +13,8 @@ library(biomaRt)
 
 
 dna <- read.csv(text = getURL("https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/DNA/AlvarezPrimo_MyHeritage_Raw_DNA.csv") )
+pgx <- read.csv(text = getURL("https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/DNA/pgx_genes.csv"), stringsAsFactors = TRUE )
+
 
 dna <- dna[7:720822,]
 
@@ -25,6 +27,18 @@ dna <- dna %>%
     )
 
 dna1 <- dna[1:1000,]
+```
+
+
+```{r}
+
+pgx <- pgx %>% 
+  rename(
+    refsnp_id = DBSNP,
+    GENES = Genes
+    )
+
+pgx
 ```
 
 
@@ -53,20 +67,25 @@ dna4 <- dna[3001:4000,]
 
 
 ```{r}
-library(biomaRt)
+#library(biomaRt)
 
 #Get all the marts names
-#listMarts()
+listMarts()
+```
 
+
+```{r}
 #select a mart to obtain dataset
-#ensembl <- useMart("ENSEMBL_MART_SNP")
+ensembl <- useMart("ENSEMBL_MART_SNP")
 
 #Dataset obtained
-#listDatasets(ensembl)
+listDatasets(ensembl)
+```
 
+
+```{r}
 #Choose Mart & Dataset so we can set filters
 ensembl=useMart("ENSEMBL_MART_SNP", dataset= "hsapiens_snp")
-
 #create filter list so we can check criteria
 myfilters <- listFilters(ensembl)
 
@@ -133,7 +152,7 @@ rsid200_a
 
 
 ```{r}
-
+pgx
 ```
 
 

@@ -1,0 +1,118 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(limma)
+library(tidyverse)
+library(dplyr)
+#library(lubridate)
+```
+
+
+```{r}
+mmr <- read.csv(text = getURL('https://raw.githubusercontent.com/fabzy4L/RStudioDataAnalysis/Main/MapMyRun/mapmyrun%20-%20data.csv'))
+```
+
+
+```{r}
+mmr
+
+data_2023 <- mmr[1,]
+data_2017 <- mmr[2:10,]
+data_2016 <- mmr[11:30,]
+
+
+#data_2023
+```
+
+
+```{r}
+# Calorie burning rate seems linear
+
+ab_x<-c(0,1,2,3,4)
+ab_y <- c(0,150,300,450,600)
+
+plot(mmr$Calories.Burned..kCal.~mmr$Distance..mi., ylab = "kCals Burned", xlab= "Distance (mi)", ylim=c(0,600))
+points(data_2023$Calories.Burned..kCal.~data_2023$Distance..mi., col = 'green')
+points(data_2017$Calories.Burned..kCal.~data_2017$Distance..mi., col = 'purple')
+points(data_2016$Calories.Burned..kCal.~data_2016$Distance..mi., col = 'red')
+#lines(ab_x,ab_y,col='red')
+abline(lm(mmr$Calories.Burned..kCal.~mmr$Distance..mi.), col='red')
+
+
+
+### abline aprox
+abline(h=479)
+abline(h=515, col='green')  ### ~ linear model is 35 kcals off for 01/10/23 session - not statistically relevant
+
+abline(v=3.15871)
+```
+
+
+```{r}
+str(data_2017)
+```
+
+
+```{r}
+dates_2017 <- as.factor(dates_2017)
+#formats <- c("%m/%d/%Y")#, "%d/%m/%Y", "%d-%b-%Y")
+  
+#dates_2017 %>% 
+#  mutate(across(contains("Date"), 
+#                ~ parse_date_time(., orders = formats))) %>%
+#  mutate(across(contains("Date"),
+#                ~ format(., "%m/%d/%Y")))
+#as.Date()
+
+distance2017 <- data_2017$Distance..mi.
+time2017 <- (data_2017$Workout.Time..seconds.)/60
+dates_2017 <- as.Date(data_2017$Date.Submitted, tryFormats=c("%m/%d/%Y"))
+```
+
+
+```{r}
+#Double sided plot
+
+#par(mfrow=c(2,2))
+
+par(mar = c(5, 4, 4, 4) + 0.3)              # Additional space for second y-axis
+plot(dates_2017,time2017, ylab="Time (mins)", xlab="Dates (2017)" )
+par(new = TRUE)                             # Add new plot
+plot(dates_2017,distance2017,  axes = FALSE, ylab="", xlab="" )
+
+axis(side = 4, at = pretty(range(distance2017)))      # Add second axis
+mtext("Distance (mi)", side = 4, line = 3)             # Add second axis label
+
+abline(h=1.5,col='red')
+abline(h=1.75,col='blue')
+```
+
+
+```{r}
+#minspermile <- 1/((distance2017)/(time2017))
+#mean(minspermile)
+
+
+plot(distance2017~time2017)
+abline(lm(distance2017~time2017))
+abline(h=1.877569, col='purple')
+text(20,2," Avg mins/mile = 11.32406 ")
+#text(20,2," Mean Time 2017 = 21.31")
+```
+
+```{r}
+plot(dates_2017,time2017, ylab="Time (mins)", xlab="Dates" )
+#points(dat)
+```
+
+
+```{r}
+interaction.plot(time2017,dates_2017,distance2017)
+```
